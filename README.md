@@ -1,1 +1,1 @@
-# arch-installer
+# simple-arch-installer
