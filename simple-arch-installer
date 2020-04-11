@@ -15,6 +15,7 @@ username=$(dialog --stdout --inputbox "Enter username" 0 0) || exit 1
 password=$(dialog --stdout --passwordbox "Enter password" 0 0) || exit 1
 password2=$(dialog --stdout --passwordbox "Confirm password" 0 0) || exit 1
 [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
+dotfiles=$(dialog --stdout --inputbox "dotfiles repo (ex: prabirshrestha/dotfiles)" 0 0) || exit 1
 
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
@@ -89,6 +90,16 @@ write_script() {
 		echo "  pacman -U --noconfirm yay-bin*.tar.xz"
 		echo "  cd .."
 		echo "  rm -rf yay-bin"
+		echo "EOF"
+		echo
+		echo "arch-chroot /mnt bash <<EOF"
+		echo "  pacman -Syu --noconfirm --needed git"
+		echo "  cd /home/$username"
+		echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
+		echo "  tar -xvf ./dot.tar.gz"
+		echo "  rm ./dot.tar.gz"
+		echo "  mv ./dot /bin/"
+		echo "  dot init $dotfiles"
 		echo "EOF"
 		echo
 		echo "# install gui"
