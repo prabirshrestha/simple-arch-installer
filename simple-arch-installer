@@ -104,7 +104,7 @@ write_script() {
 		echo "  #pacman -S --noconfirm bspwm sxhkd"
 		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
 		echo "  #pacman -S --noconfirm xfce4"
-		echo "  pacman -S --noconfirm plasma"
+		echo "  pacman -S --noconfirm plasma konsole"
 		echo
 		echo "  pacman -S --noconfirm firefox"
 		echo "EOF"
