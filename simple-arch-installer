@@ -100,7 +100,7 @@ write_script() {
 		echo
 		echo "  pacman -S --noconfirm lightdm; systemctl enable lightdm"
 		echo
-		echo "  #pacman -S --noconfrim bspwm sxhkd"
+		echo "  #pacman -S --noconfirm bspwm sxhkd"
 		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
 		echo "  #pacman -S --noconfirm xfce4"
 		echo "  pacman -S --noconfirm plasma"
