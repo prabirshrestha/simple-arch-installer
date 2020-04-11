@@ -92,17 +92,19 @@ write_script() {
 		echo "EOF"
 		echo
 		echo "# install gui"
-		echo "pacman -S --noconfirm xf86-video-intel"
-		echo "#pacman -S --noconfirm xf86-video-nouveau"
+		echo "arch-chroot /mnt bash <<EOF"
+		echo "  pacman -S --noconfirm xf86-video-intel"
+		echo "  #pacman -S --noconfirm xf86-video-nouveau"
 		echo
-		echo "pacman -S --noconfirm xorg-server xorg-server-utils xorg-xinit xterm"
+		echo "  pacman -S --noconfirm xorg-server xorg-server-utils xorg-xinit xterm"
 		echo
-		echo "#pacman -S --noconfrim bspwm"
-		echo "#pacman -S --noconfirm gnome gdm; systemctl enable gdm"
-		echo "#pacman -S --noconfirm xfce4"
-		echo "#pacman -S --noconfirm plasma"
+		echo "  #pacman -S --noconfrim bspwm"
+		echo "  #pacman -S --noconfirm gnome gdm; systemctl enable gdm"
+		echo "  #pacman -S --noconfirm xfce4"
+		echo "  #pacman -S --noconfirm plasma"
 		echo
-		echo "pacman -S --noconfirm firefox"
+		echo "  pacman -S --noconfirm firefox"
+		echo "EOF"
 		echo
 		echo
 		echo "# create user password"
