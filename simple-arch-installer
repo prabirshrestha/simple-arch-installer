@@ -49,8 +49,6 @@ write_script() {
 		echo "mount $device_boot /mnt/boot/efi"
 		echo "pacstrap /mnt base linux linux-firmware grub efibootmgr vim networkmanager"
 		echo
-		echo "cp $0 /mnt/root/"
-		echo
 		echo "genfstab -U -p /mnt > /mnt/etc/fstab"
 		echo
 		echo "ln -sf /mnt/usr/share/zoneinfo/US/Pacific /mnt/etc/localtime"
@@ -78,6 +76,37 @@ write_script() {
 		echo "# create user"
 		echo "arch-chroot /mnt sh <<EOF"
 		echo "	useradd -Nm -g users -G wheel,sys \"$username\""
+		echo "EOF"
+		echo
+		echo "# install yay-bin"
+		echo "arch-chroot /mnt bash <<EOF"
+		echo "  pacman -Syu --noconfirm --needed git base-devel"
+		echo "  cd /home/$(esc "$username")"
+		echo "  rm -rf yay-bin"
+		echo "  su $(esc "$username") -c 'git clone https://aur.archlinux.org/yay-bin.git'"
+		echo "  cd yay-bin"
+		echo "  su $(esc "$username") -c 'makepkg'"
+		echo "  pacman -U --noconfirm yay-bin*.tar.xz"
+		echo "  cd .."
+		echo "  rm -rf yay-bin"
+		echo "EOF"
+		echo
+		echo "# install gui"
+		echo "pacman -S --noconfirm xf86-video-intel"
+		echo "#pacman -S --noconfirm xf86-video-nouveau"
+		echo
+		echo "pacman -S --noconfirm xorg-server xorg-server-utils xorg-xinit xterm"
+		echo
+		echo "#pacman -S --noconfrim bspwm"
+		echo "#pacman -S --noconfirm gnome gdm; systemctl enable gdm"
+		echo "#pacman -S --noconfirm xfce4"
+		echo "#pacman -S --noconfirm plasma"
+		echo
+		echo "pacman -S --noconfirm firefox"
+		echo
+		echo
+		echo "# create user password"
+		echo "arch-chroot /mnt sh <<EOF"
 		echo "	echo -e "$password"\"\\n\"$password | passwd \"$username\""
 		echo "EOF"
 		echo
