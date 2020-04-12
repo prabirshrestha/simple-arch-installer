@@ -99,7 +99,7 @@ write_script() {
 		echo "  tar -xvf ./dot.tar.gz"
 		echo "  rm ./dot.tar.gz"
 		echo "  mv ./dot /bin/"
-		echo "  dot init $dotfiles"
+		echo "  su $username -c 'dot init $dotfiles'"
 		echo "EOF"
 		echo
 		echo "# install gui"
