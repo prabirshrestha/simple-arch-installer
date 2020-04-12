@@ -107,13 +107,14 @@ write_script() {
 		echo "  pacman -S --noconfirm xf86-video-intel"
 		echo "  #pacman -S --noconfirm xf86-video-nouveau"
 		echo
-		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm"
+		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm ttf-font-awesome"
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
 		echo
-		echo "  su $username -c 'yay -S --noconfirm dwm-git'"
+		echo "  "su $username -c 'yay -S --noconfirm dwm-git'"
 		echo "  #pacman -S --noconfirm awesome rofi"
-		echo "  #pacman -S --noconfirm bspwm sxhkd; yay -S --noconfirm lemonbar-git"
+		echo "  pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop"
+		echo "  "su $username -c 'yay -S --noconfirm lemonbar-git'"
 		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
 		echo "  #pacman -S --noconfirm xfce4"
 		echo "  #pacman -S --noconfirm plasma konsole"
@@ -122,7 +123,9 @@ write_script() {
 		echo "EOF"
 		echo
 		echo "# dev"
+		echo "arch-chroot /mnt sh <<EOF"
 		echo "  pacman -S --noconfirm alacritty gvim openssh tmux"
+		echo "EOF"
 		echo
 		echo "# create user password"
 		echo "arch-chroot /mnt sh <<EOF"
