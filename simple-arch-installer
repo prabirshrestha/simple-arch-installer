@@ -111,7 +111,7 @@ write_script() {
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
 		echo
-		echo "  su $username -c 'yay -S --noconfirm dwm'"
+		echo "  su $username -c 'yay -S --noconfirm dwm-git'"
 		echo "  #pacman -S --noconfirm awesome rofi"
 		echo "  #pacman -S --noconfirm bspwm sxhkd; yay -S --noconfirm lemonbar-git"
 		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
