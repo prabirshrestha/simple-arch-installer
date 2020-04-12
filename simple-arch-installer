@@ -102,6 +102,14 @@ write_script() {
 		echo "  su $username -c 'dot init $dotfiles'"
 		echo "EOF"
 		echo
+		echo "arch-chroot /mnt bash <<EOF"
+		echo "  cd /home/$username"
+		echo "  curl -Lk https://github.com/wez/wezterm/releases/download/20200406-151651-5b700e4/wezterm-20200406-151651-5b700e4.tar.xz -o wezterm.tar.gz"
+		echo "  tar -xvf ./wezterm.tar.gz"
+		echo "  rm ./wezterm.tar.gz"
+		echo "  mv ./wezterm /bin/"
+		echo "EOF"
+		echo
 		echo "# install gui"
 		echo "arch-chroot /mnt bash <<EOF"
 		echo "  pacman -S --noconfirm xf86-video-intel"
