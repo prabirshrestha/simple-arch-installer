@@ -114,7 +114,7 @@ write_script() {
 		echo "  #su $username -c 'yay -S --noconfirm dwm-git'"
 		echo "  #pacman -S --noconfirm awesome rofi"
 		echo "  pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop"
-		echo "  "su $username -c 'yay -S --noconfirm lemonbar-git'"
+		echo "  su $username -c 'yay -S --noconfirm lemonbar-git'"
 		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
 		echo "  #pacman -S --noconfirm xfce4"
 		echo "  #pacman -S --noconfirm plasma konsole"
