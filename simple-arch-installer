@@ -92,17 +92,6 @@ write_script() {
 		echo "  rm -rf yay-bin"
 		echo "EOF"
 		echo
-		echo "arch-chroot /mnt bash <<EOF"
-		echo "  pacman -Syu --noconfirm --needed git"
-		echo "  cd /home/$username"
-		echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
-		echo "  tar -xvf ./dot.tar.gz"
-		echo "  rm ./dot.tar.gz"
-		echo "  mv ./dot /bin/"
-		echo "  su $username -c 'dot init $dotfiles'"
-		echo "EOF"
-		echo
-		echo
 		echo "# install gui"
 		echo "arch-chroot /mnt bash <<EOF"
 		echo "  pacman -S --noconfirm xf86-video-intel"
@@ -128,6 +117,16 @@ write_script() {
 		echo "# dev"
 		echo "arch-chroot /mnt sh <<EOF"
 		echo "  pacman -S --noconfirm gvim openssh tmux unzip wget"
+		echo "EOF"
+		echo
+		echo "arch-chroot /mnt bash <<EOF"
+		echo "  pacman -Syu --noconfirm --needed git"
+		echo "  cd /home/$username"
+		echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
+		echo "  tar -xvf ./dot.tar.gz"
+		echo "  rm ./dot.tar.gz"
+		echo "  mv ./dot /bin/"
+		echo "  su $username -c 'dot init $dotfiles'"
 		echo "EOF"
 		echo
 		echo "arch-chroot /mnt bash <<EOF"
