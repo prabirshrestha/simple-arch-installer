@@ -111,7 +111,7 @@ write_script() {
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
 		echo
-		echo "  pacman -S awesome"
+		echo "  pacman -S --noconfirm awesome"
 		echo "  #pacman -S --noconfirm bspwm sxhkd"
 		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
 		echo "  #pacman -S --noconfirm xfce4"
