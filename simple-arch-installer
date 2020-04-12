@@ -97,7 +97,7 @@ write_script() {
 		echo "  pacman -S --noconfirm xf86-video-intel"
 		echo "  #pacman -S --noconfirm xf86-video-nouveau"
 		echo
-		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight ttf-fira-code ttf-free-font ttf-arphic-uming ttf-baekmuk"
+		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk"
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
 		echo
