@@ -107,7 +107,7 @@ write_script() {
 		echo "  pacman -S --noconfirm xf86-video-intel"
 		echo "  #pacman -S --noconfirm xf86-video-nouveau"
 		echo
-		echo "  pacman -S --noconfirm xorg-server xorg-server-utils xorg-xinit xterm"
+		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm"
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
 		echo
@@ -120,6 +120,8 @@ write_script() {
 		echo "  pacman -S --noconfirm firefox"
 		echo "EOF"
 		echo
+		echo "# dev"
+		echo "  pacman -S --noconfirm vim openssh"
 		echo
 		echo "# create user password"
 		echo "arch-chroot /mnt sh <<EOF"
