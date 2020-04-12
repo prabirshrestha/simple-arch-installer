@@ -48,7 +48,7 @@ write_script() {
 		echo "mount $device_root /mnt"
 		echo "mkdir -p /mnt/boot/efi"
 		echo "mount $device_boot /mnt/boot/efi"
-		echo "pacstrap /mnt base linux linux-firmware grub efibootmgr vim networkmanager"
+		echo "pacstrap /mnt base linux linux-firmware grub efibootmgr networkmanager"
 		echo
 		echo "genfstab -U -p /mnt > /mnt/etc/fstab"
 		echo
@@ -121,7 +121,7 @@ write_script() {
 		echo "EOF"
 		echo
 		echo "# dev"
-		echo "  pacman -S --noconfirm vim openssh"
+		echo "  pacman -S --noconfirm alacritty gvim openssh tmux"
 		echo
 		echo "# create user password"
 		echo "arch-chroot /mnt sh <<EOF"
