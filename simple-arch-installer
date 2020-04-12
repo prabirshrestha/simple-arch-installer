@@ -115,7 +115,7 @@ write_script() {
 		echo "  pacman -S --noconfirm xf86-video-intel"
 		echo "  #pacman -S --noconfirm xf86-video-nouveau"
 		echo
-		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm ttf-fira-code"
+		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-backlight ttf-fira-code"
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
 		echo
@@ -128,6 +128,8 @@ write_script() {
 		echo "  #pacman -S --noconfirm plasma konsole"
 		echo
 		echo "  pacman -S --noconfirm firefox"
+		echo
+		echo "  xbacklight -set 100"
 		echo "EOF"
 		echo
 		echo "# dev"
