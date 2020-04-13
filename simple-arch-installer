@@ -117,6 +117,7 @@ write_script() {
 		echo "# dev"
 		echo "arch-chroot /mnt sh <<EOF"
 		echo "  pacman -S --noconfirm vim openssh tmux unzip wget virtualbox"
+		echo "  pacman -S --noconfirm docker; systemctl enable docker.service"
 		echo "EOF"
 		echo
 		echo "arch-chroot /mnt bash <<EOF"
