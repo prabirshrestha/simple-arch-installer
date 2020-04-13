@@ -111,7 +111,7 @@ write_script() {
 		echo
 		echo "  pacman -S --noconfirm firefox"
 		echo
-		echo "  xbacklight -set 100"
+		echo "  #xbacklight -set 100"
 		echo "EOF"
 		echo
 		echo "# dev"
