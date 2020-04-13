@@ -116,7 +116,7 @@ write_script() {
 		echo
 		echo "# dev"
 		echo "arch-chroot /mnt sh <<EOF"
-		echo "  pacman -S --noconfirm gvim openssh tmux unzip wget"
+		echo "  pacman -S --noconfirm gvim openssh tmux unzip wget virtualbox"
 		echo "EOF"
 		echo
 		echo "arch-chroot /mnt bash <<EOF"
