@@ -143,6 +143,7 @@ write_script() {
 		echo "  tar -xvf ./wezterm.tar.gz"
 		echo "  rm ./wezterm.tar.gz"
 		echo "  mv ./wezterm /usr/bin/"
+		echo "  chmod a+x /usr/bin/wezterm"
 		echo "EOF"
 		echo
 		echo "# create user password"
