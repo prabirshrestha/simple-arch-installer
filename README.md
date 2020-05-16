@@ -8,7 +8,7 @@
 4. Run the following command to start the installer.
 
 ```bash
-bash <(curl -sL https://bit.ly/simple-arch-installer)`
+bash <(curl -sL https://bit.ly/simple-arch-installer)
 ```
 
 ## License
