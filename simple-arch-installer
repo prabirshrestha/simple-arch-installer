@@ -109,7 +109,7 @@ write_script() {
 		echo "  #pacman -S --noconfirm xfce4"
 		echo "  #pacman -S --noconfirm plasma konsole"
 		echo
-		echo "  pacman -S --noconfirm firefox"
+		echo "  pacman -S --noconfirm firefox-developer-edition"
 		echo
 		echo "  #xbacklight -set 100"
 		echo "EOF"
