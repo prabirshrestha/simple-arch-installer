@@ -90,7 +90,7 @@ write_script() {
 		echo "  pacman -U --noconfirm yay-bin*.tar.xz"
 		echo "  cd .."
 		echo "  rm -rf yay-bin"
-		echo "  su $username -c 'yay -S --noconfirm yay-bin'"
+		echo "  sudo -u $username yay -S --needed --noconfirm yay-bin
 		echo "EOF"
 		echo
 		echo "# install gui"
@@ -138,7 +138,7 @@ write_script() {
 		echo "EOF"
 		echo
 		echo "arch-chroot /mnt bash <<EOF"
-		echo "  su $username -c 'yay -S --noconfirm wezterm-bin'"
+		echo "  sudo -u $username yay -S --needed --noconfirm wezterm-bin
 		echo "EOF"
 		echo
 		echo "# create user password"
