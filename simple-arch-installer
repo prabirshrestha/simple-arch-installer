@@ -90,6 +90,7 @@ write_script() {
 		echo "  pacman -U --noconfirm yay-bin*.tar.xz"
 		echo "  cd .."
 		echo "  rm -rf yay-bin"
+		echo "  su $username -c 'yay -S --noconfirm yay-bin'"
 		echo "EOF"
 		echo
 		echo "# install gui"
