@@ -128,7 +128,7 @@ write_script() {
 		echo "arch-chroot /mnt sh <<EOF"
 		echo "  pacman -S --noconfirm gvim openssh tmux unzip wget ripgrep fzf man flameshot libz3"
 		echo "  pacman -S --noconfirm virtualbox"
-		echo "  pacman -S --noconfirm rust && cargo install cargo-edit whatfeatures"
+		echo "  pacman -S --noconfirm rust"
 		echo "  pacman -S --noconfirm docker; usermod -aG docker $username; systemctl enable docker.service"
 		echo "EOF"
 		echo
