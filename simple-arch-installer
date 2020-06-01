@@ -80,6 +80,7 @@ write_script() {
 		echo "# create user"
 		echo "arch-chroot /mnt sh <<EOF"
 		echo "	useradd -Nm -g users -G wheel,sys \"$username\""
+		echo "  passwd -d \"$username\""
 		echo "EOF"
 		echo
 		echo "# install yay-bin"
