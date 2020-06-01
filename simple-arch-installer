@@ -49,7 +49,7 @@ write_script() {
 		echo "mkdir -p /mnt/boot/efi"
 		echo "mount $device_boot /mnt/boot/efi"
 		echo
-		echo "arch-chroot /mnt echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
+		echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /mnt/etc/pacman.d/mirrorlist"
 		echo
 		echo "pacstrap /mnt base linux linux-firmware grub efibootmgr networkmanager"
 		echo
