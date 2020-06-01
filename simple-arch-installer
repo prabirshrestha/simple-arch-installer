@@ -52,7 +52,7 @@ write_script() {
 		echo
 		echo "genfstab -U -p /mnt > /mnt/etc/fstab"
 		echo
-		echo "ln -sf /mnt/usr/share/zoneinfo/US/Pacific /mnt/etc/localtime"
+		echo "ln -sf /mnt/usr/share/zoneinfo/America/Los_Angeles /mnt/etc/localtime"
 		echo
 		echo "echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf"
 		echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
