@@ -90,7 +90,6 @@ write_script() {
 		echo "  pacman -U --noconfirm yay-bin*.tar.xz"
 		echo "  cd .."
 		echo "  rm -rf yay-bin"
-		echo "  sudo -u $username yay -S --needed --noconfirm yay-bin"
 		echo "EOF"
 		echo
 		echo "# install gui"
@@ -138,7 +137,12 @@ write_script() {
 		echo "EOF"
 		echo
 		echo "arch-chroot /mnt bash <<EOF"
-		echo "  sudo -u $username yay -S --needed --noconfirm wezterm-bin"
+		echo "  cd /home/$username"
+		echo "  curl -Lk https://github.com/wez/wezterm/releases/download/20200406-151651-5b700e4/wezterm-20200406-151651-5b700e4.tar.xz -o wezterm.tar.gz"
+		echo "  tar -xvf ./wezterm.tar.gz"
+		echo "  rm ./wezterm.tar.gz"
+		echo "  mv ./wezterm /usr/bin/"
+		echo "  chmod a+x /usr/bin/wezterm"
 		echo "EOF"
 		echo
 		echo "# create user password"
@@ -169,4 +173,3 @@ case $response in
 	1) clear && echo "Cancelling installation";;
 	255) clear && echo "Cancelling installation";;
 esac
-
