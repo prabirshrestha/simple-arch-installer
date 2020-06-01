@@ -48,6 +48,9 @@ write_script() {
 		echo "mount $device_root /mnt"
 		echo "mkdir -p /mnt/boot/efi"
 		echo "mount $device_boot /mnt/boot/efi"
+		echo
+		echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\$repo/os/\$arch\" >> /etc/pacman.d/mirrorlist"
+		echo
 		echo "pacstrap /mnt base linux linux-firmware grub efibootmgr networkmanager"
 		echo
 		echo "genfstab -U -p /mnt > /mnt/etc/fstab"
