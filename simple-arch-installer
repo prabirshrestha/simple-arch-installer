@@ -96,7 +96,7 @@ write_script() {
 		echo "  rm -rf yay-bin"
 		echo "EOF"
 		echo
-		echo "arch-chroot /mnt sudo -u $username yay --noconfirm -S wezterm-bin"
+		echo "arch-chroot /mnt sudo -u $username yay --noconfirm -S wezterm-nightly-bin"
 		echo
 		echo "# install gui"
 		echo "arch-chroot /mnt bash <<EOF"
