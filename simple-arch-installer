@@ -107,7 +107,7 @@ write_script() {
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo "  # acpid for battery status"
-		echo "  pacman -S --noconfirm acpid; systemctl enable acpid"
+		echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
 		echo
 		echo "  #su $username -c 'yay -S --noconfirm dwm-git'"
 		echo "  pacman -S --noconfirm awesome nemo rofi"
