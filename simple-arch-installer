@@ -106,6 +106,8 @@ write_script() {
 		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
 		echo
 		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
+        echo "  # acpid for battery status"
+		echo "  pacman -S --noconfirm acpid; systemctl enable acpid"
 		echo
 		echo "  #su $username -c 'yay -S --noconfirm dwm-git'"
 		echo "  pacman -S --noconfirm awesome nemo rofi"
