@@ -110,7 +110,7 @@ write_script() {
 		echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
 		echo
 		echo "  #su $username -c 'yay -S --noconfirm dwm-git'"
-		echo "  pacman -S --noconfirm awesome nemo rofi"
+		echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
 		echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
 		echo "  #su $username -c 'yay -S --noconfirm lemonbar-git'"
 		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
