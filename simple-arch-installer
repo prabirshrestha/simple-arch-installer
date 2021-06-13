@@ -93,7 +93,7 @@ write_script() {
 		echo "  su $username -c 'git clone https://aur.archlinux.org/yay-bin.git'"
 		echo "  cd yay-bin"
 		echo "  su $username -c 'makepkg'"
-		echo "  pacman -U --noconfirm yay-bin*.tar.xz"
+		echo "  pacman -U --noconfirm yay-bin*pkg.tar.zst"
 		echo "  cd .."
 		echo "  rm -rf yay-bin"
 		echo "EOF"
