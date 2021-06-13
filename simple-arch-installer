@@ -42,7 +42,7 @@ write_script() {
 		echo "sgdisk -t 2:ef00 $device"
 		echo "sgdisk -A 2:set:2 $device"
 		echo
-		echo "mkfs.ext4 -F $device_root"
+		echo "mkfs.btrfs -f $device_root"
 		echo "mkfs.fat -F32 $device_boot"
 		echo
 		echo "mount $device_root /mnt"
