@@ -87,10 +87,11 @@ write_script() {
 		echo
 		echo "# install paru-bin"
 		echo "arch-chroot /mnt bash <<EOF"
-		echo "  pacman -Syu --noconfirm --needed git base-devel"
+		echo "  pacman -Syu --noconfirm --needed base-devel"
 		echo "  cd /home/$username"
 		echo "  rm -rf paru-bin"
-		echo "  su $username -c 'git clone https://aur.archlinux.org/paru-bin.git'"
+		echo "  su $username -c 'curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz'"
+		echo "  su $username -c 'tar -xvf paru-bin.tar.gz'"
 		echo "  cd paru-bin"
 		echo "  su $username -c 'makepkg'"
 		echo "  pacman -U --noconfirm paru-bin*.pkg.*"
@@ -130,7 +131,7 @@ write_script() {
 		echo
 		echo "# dev"
 		echo "arch-chroot /mnt sh <<EOF"
-		echo "  pacman -S --noconfirm gvim openssh tmux unzip wget ripgrep fzf man flameshot libz3"
+		echo "  pacman -S --noconfirm gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
 		echo "  pacman -S --noconfirm virtualbox"
 		echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
 		echo "  pacman -S --noconfirm docker; usermod -aG docker $username; systemctl enable docker.service"
