@@ -8,6 +8,8 @@
 set -eo pipefail
 trap quit:no_message INT
 
+command -v dialog >/dev/null 2>&1 || pacman -Sy --noconfirm --needed dialog
+
 INSTALL_SCRIPT=install_arch.sh
 EDITOR=vim
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
