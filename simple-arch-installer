@@ -43,135 +43,135 @@ read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles): " DOTFILES_REP
 
 write_script() {
 	(
-		echo "#!/usr/bin/env bash"
-		echo "#"
-		echo "# Please review the install script below"
-		echo "#"
-		echo "set -euo pipefail"
-		echo
-		echo "export DISK=$DISK"
-		echo "sgdisk --clear \ "
-		echo "    --new=1:0:+260MiB --typecode=1:ef00 --change-name=1:EFI \\"
-		echo "    --new=2:0:+240MiB --typecode=2:8309 --change-name=2:cryptboot \\"
-		echo "    --new=3:0:+32GiB  --typecode=3:8309 --change-name=3:cryptswap \\"
-		echo "    --new=4:0:0       --typecode=4:8309 --change-name=4:cryptsystem \\"
-		echo "    \$DISK"
-		echo
-		echo "cryptsetup luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot"
-		echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem"
-		echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap"
-		echo
-		echo "cryptsetup open /dev/disk/by-partlabel/cryptboot boot"
-		echo "cryptsetup open /dev/disk/by-partlabel/cryptswap swap"
-		echo "cryptsetup open /dev/disk/by-partlabel/cryptsystem system"
-		echo
-		echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
-		echo "mkfs.ext4 -L boot /dev/mapper/boot"
-		echo "mkfs.btrfs --label system /dev/mapper/system"
-		echo "mkswap -L swap /dev/mapper/swap"
-		echo "swapon -L swap"
-		echo
-		echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
-		echo
-		echo "pacstrap /mnt base base-devel linux linux-firmware grub efibootmgr networkmanager sudo vim"
-		echo
-		echo "genfstab -U -p /mnt > /mnt/etc/fstab"
-		echo
-		echo "ln -sf /mnt/usr/share/zoneinfo/America/Los_Angeles /mnt/etc/localtime"
-		echo
-		echo "echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf"
-		echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
-		echo "arch-chroot /mnt locale-gen"
-		echo
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	echo ${hostname} > /etc/hostname"
-		echo "EOF"
-		echo "arch-chroot /mnt systemctl enable NetworkManager.service"
-		echo
-		echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi --recheck"
-		echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
-		echo "mkdir -p /mnt/boot/efi/EFI/BOOT"
-		echo "cp /mnt/boot/efi/EFI/GRUB/grubx64.efi /mnt/boot/efi/EFI/BOOTX64.EFI"
-		echo
-		echo "# setup sudo"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	echo '%wheel ALL=(ALL) ALL' | sudo EDITOR='tee -a' visudo"
-		echo "EOF"
-		echo
-		echo "# create user"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	useradd -Nm -g users -G wheel,sys \"$username\""
-		echo "  passwd -d \"$username\""
-		echo "EOF"
-		echo
-		echo "# install paru-bin"
-		echo "arch-chroot /mnt bash <<EOF"
-		echo "  cd /tmp"
-		echo "  curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz"
-		echo "  tar -xvf paru-bin.tar.gz"
-		echo "  chmod 777 paru-bin"
-		echo "  cd paru-bin"
-		echo "  su $username"
-		echo "  makepkg -sirc --noconfirm"
-		echo "EOF"
-		echo
-		echo "arch-chroot /mnt sudo -u $username paru --noconfirm -S wezterm-bin nerd-fonts-fira-code lua z.lua"
-		echo
-		echo "# install gui"
-		echo "arch-chroot /mnt bash <<EOF"
-		echo "  pacman -S --noconfirm xf86-video-intel"
-		echo "  #pacman -S --noconfirm xf86-video-nouveau"
-		echo
-		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
-		echo
-		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
+        echo "#!/usr/bin/env bash"
+        echo "#"
+        echo "# Please review the install script below"
+        echo "#"
+        echo "set -euo pipefail"
+        echo
+        echo "export DISK=$DISK"
+        echo "sgdisk --clear \\ "
+        echo "    --new=1:0:+260MiB --typecode=1:ef00 --change-name=1:EFI \\ "
+        echo "    --new=2:0:+240MiB --typecode=2:8309 --change-name=2:cryptboot \\ "
+        echo "    --new=3:0:+32GiB  --typecode=3:8309 --change-name=3:cryptswap \\ "
+        echo "    --new=4:0:0       --typecode=4:8309 --change-name=4:cryptsystem \\ "
+        echo "\$DISK "
+        echo
+        echo "cryptsetup luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot"
+        echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem"
+        echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap"
+        echo
+        echo "cryptsetup open /dev/disk/by-partlabel/cryptboot boot"
+        echo "cryptsetup open /dev/disk/by-partlabel/cryptswap swap"
+        echo "cryptsetup open /dev/disk/by-partlabel/cryptsystem system"
+        echo
+        echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
+        echo "mkfs.ext4 -L boot /dev/mapper/boot"
+        echo "mkfs.btrfs --label system /dev/mapper/system"
+        echo "mkswap -L swap /dev/mapper/swap"
+        echo "swapon -L swap"
+        echo
+        echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
+        echo
+        echo "pacstrap /mnt base base-devel linux linux-firmware grub efibootmgr networkmanager sudo vim"
+        echo
+        echo "genfstab -U -p /mnt > /mnt/etc/fstab"
+        echo
+        echo "ln -sf /mnt/usr/share/zoneinfo/America/Los_Angeles /mnt/etc/localtime"
+        echo
+        echo "echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf"
+        echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
+        echo "arch-chroot /mnt locale-gen"
+        echo
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "	echo ${hostname} > /etc/hostname"
+        echo "EOF"
+        echo "arch-chroot /mnt systemctl enable NetworkManager.service"
+        echo
+        echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi --recheck"
+        echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
+        echo "mkdir -p /mnt/boot/efi/EFI/BOOT"
+        echo "cp /mnt/boot/efi/EFI/GRUB/grubx64.efi /mnt/boot/efi/EFI/BOOTX64.EFI"
+        echo
+        echo "# setup sudo"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "	echo '%wheel ALL=(ALL) ALL' | sudo EDITOR='tee -a' visudo"
+        echo "EOF"
+        echo
+        echo "# create user"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "	useradd -Nm -g users -G wheel,sys \"$username\""
+        echo "  passwd -d \"$username\""
+        echo "EOF"
+        echo
+        echo "# install paru-bin"
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  cd /tmp"
+        echo "  curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz"
+        echo "  tar -xvf paru-bin.tar.gz"
+        echo "  chmod 777 paru-bin"
+        echo "  cd paru-bin"
+        echo "  su $username"
+        echo "  makepkg -sirc --noconfirm"
+        echo "EOF"
+        echo
+        echo "arch-chroot /mnt sudo -u $username paru --noconfirm -S wezterm-bin nerd-fonts-fira-code lua z.lua"
+        echo
+        echo "# install gui"
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  pacman -S --noconfirm xf86-video-intel"
+        echo "  #pacman -S --noconfirm xf86-video-nouveau"
+        echo
+        echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
+        echo
+        echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo "  # acpid for battery status"
-		echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
-		echo
-		echo "  #su $username -c 'paru -S --noconfirm dwm-git'"
-		echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
-		echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
-		echo "  #su $username -c 'paru -S --noconfirm lemonbar-git'"
-		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
-		echo "  #pacman -S --noconfirm xfce4"
-		echo "  #pacman -S --noconfirm plasma konsole"
-		echo
-		echo "  pacman -S --noconfirm firefox-developer-edition"
-		echo
-		echo "  #xbacklight -set 100"
-		echo "EOF"
-		echo
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "  pacman -S --noconfirm fuse"
-		echo "EOF"
-		echo
-		echo "# dev"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "  pacman -S --noconfirm gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
-		echo "  pacman -S --noconfirm virtualbox"
-		echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
-		echo "  pacman -S --noconfirm docker; usermod -aG docker $username; systemctl enable docker.service"
-		echo "EOF"
-		echo
-		echo "arch-chroot /mnt bash <<EOF"
-		echo "  pacman -Syu --noconfirm --needed git"
-		echo "  cd /home/$username"
-		echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
-		echo "  tar -xvf ./dot.tar.gz"
-		echo "  rm ./dot.tar.gz"
-		echo "  mv ./dot /bin/"
-		echo "  su $username -c 'dot init $dotfiles'"
-		echo "EOF"
-		echo
-		echo "# create user password"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	echo -e "$password"\"\\n\"$password | passwd \"$username\""
-		echo "EOF"
-		echo
-		echo "# disallow root login"
-		echo "arch-chroot /mnt passwd -l root"
-	) > "$INSTALL_SCRIPT"
-	chmod +x "$INSTALL_SCRIPT"
+        echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
+        echo
+        echo "  #su $username -c 'paru -S --noconfirm dwm-git'"
+        echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
+        echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
+        echo "  #su $username -c 'paru -S --noconfirm lemonbar-git'"
+        echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
+        echo "  #pacman -S --noconfirm xfce4"
+        echo "  #pacman -S --noconfirm plasma konsole"
+        echo
+        echo "  pacman -S --noconfirm firefox-developer-edition"
+        echo
+        echo "  #xbacklight -set 100"
+        echo "EOF"
+        echo
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  pacman -S --noconfirm fuse"
+        echo "EOF"
+        echo
+        echo "# dev"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  pacman -S --noconfirm gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
+        echo "  pacman -S --noconfirm virtualbox"
+        echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
+        echo "  pacman -S --noconfirm docker; usermod -aG docker $username; systemctl enable docker.service"
+        echo "EOF"
+        echo
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  pacman -Syu --noconfirm --needed git"
+        echo "  cd /home/$username"
+        echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
+        echo "  tar -xvf ./dot.tar.gz"
+        echo "  rm ./dot.tar.gz"
+        echo "  mv ./dot /bin/"
+        echo "  su $username -c 'dot init $dotfiles'"
+        echo "EOF"
+        echo
+        echo "# create user password"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "	echo -e "$password"\"\\n\"$password | passwd \"$username\""
+        echo "EOF"
+        echo
+        echo "# disallow root login"
+        echo "arch-chroot /mnt passwd -l root"
+    ) > "$INSTALL_SCRIPT"
+    chmod +x "$INSTALL_SCRIPT"
 }
 
 write_script
