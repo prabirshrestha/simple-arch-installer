@@ -55,10 +55,11 @@ write_script() {
         echo "sgdisk --new=2:0:+240MiB --typecode=2:8309 --change-name=2:cryptboot \$DISK"
         echo "sgdisk --new=3:0:+32GiB  --typecode=3:8309 --change-name=3:cryptswap \$DISK"
         echo "sgdisk --new=4:0:0       --typecode=4:8309 --change-name=4:cryptsystem \$DISK"
+        echo "sync"
         echo
-        echo "cryptsetup luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot"
-        echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem"
-        echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap"
+        echo "cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot"
+        echo "cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem"
+        echo "cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap"
         echo
         echo "cryptsetup open /dev/disk/by-partlabel/cryptboot boot"
         echo "cryptsetup open /dev/disk/by-partlabel/cryptswap swap"
