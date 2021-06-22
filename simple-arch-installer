@@ -92,13 +92,13 @@ write_script() {
         echo "btrfs subvolume create /mnt/@tmp"
         echo "umount -R /mnt"
         echo
-        echo "mount -t btrfs -o subvol=@,$o_btrfs LABEL=system /mnt"
-        echo "mount -t btrfs -o subvol=@home,$o_btrfs LABEL=system /mnt/home"
-        echo "mount -t btrfs -o subvol=@log,$o_btrfs LABEL=system /mnt/var/log"
-        echo "mount -t btrfs -o subvol=@root,$o_btrfs LABEL=system /mnt/root"
-        echo "mount -t btrfs -o subvol=@tmp,$o_btrfs LABEL=system /mnt/var/tmp"
-        echo "mount -t vfat -o $o LABEL=EFI /mnt/efi"
-        echo "mount -t ext4 -o $o LABEL=boot /mnt/boot"
+        echo "mount -t btrfs -o subvol=@,\$o_btrfs LABEL=system /mnt"
+        echo "mount -t btrfs -o subvol=@home,\$o_btrfs LABEL=system /mnt/home"
+        echo "mount -t btrfs -o subvol=@log,\$o_btrfs LABEL=system /mnt/var/log"
+        echo "mount -t btrfs -o subvol=@root,\$o_btrfs LABEL=system /mnt/root"
+        echo "mount -t btrfs -o subvol=@tmp,\$o_btrfs LABEL=system /mnt/var/tmp"
+        echo "mount -t vfat -o \$o LABEL=EFI /mnt/efi"
+        echo "mount -t ext4 -o \$o LABEL=boot /mnt/boot"
         echo
         echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
         echo
