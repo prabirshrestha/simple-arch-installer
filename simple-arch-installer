@@ -12,6 +12,38 @@ command -v dialog >/dev/null 2>&1 || pacman -Sy --noconfirm --needed dialog
 
 INSTALL_SCRIPT=install_arch.sh
 EDITOR=vim
+
+lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac
+read -p "Enter disk name" DISK
+read -p "Overwite disk with random data (y/n)" OVERWRITE_RANDOM_DATA
+
+local password1=x
+local password2=y
+until [[ $password1 == $password2 ]]; do
+    read -s -p "Enter disk password: "password1
+    echo
+    read -s -p "Confirm disk password: "password2
+    echo
+    DISK_PASSWORD=$password1
+done
+
+read -p "Enter hostname" HOSTNAME
+read -p "Enter username" USERNAME
+local password1=x
+local password2=y
+until [[ $password1 == $password2 ]]; do
+    read -s -p "Enter user password: "password1
+    echo
+    read -s -p "Confirm user password: "password2
+    echo
+    USER_PASSWORD=$password1
+done
+
+read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles)" DOTFILES_REPO
+
+exit
+
+
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 username=$(dialog --stdout --inputbox "Enter username" 0 0) || exit 1
 password=$(dialog --stdout --passwordbox "Enter password" 0 0) || exit 1
