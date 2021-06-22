@@ -183,13 +183,8 @@ reset
 clear
 
 read -p "Are you sure you want to run the archlinux installer script (YES is capital letter to run): " RUN_INSTALLER
-if [ "$RUN_INSTALLER" != 'YES' ]; then
-    exit 1
+if [ "$RUN_INSTALLER" == "YES" ]; then
+    bash "$INSTALL_SCRIPT"
+else
+    echo "Cancelling installation"
 fi
-clear
-
-case $response in
-	0) bash "$INSTALL_SCRIPT";;
-	1) clear && echo "Cancelling installation";;
-	255) clear && echo "Cancelling installation";;
-esac
