@@ -58,10 +58,12 @@ write_script() {
         echo "sleep 1"
         echo "sync"
         echo
+        echo "cryptsetup..."
         echo "cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot"
         echo "cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem"
         echo "cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap"
         echo
+        echo "cryptopen..."
         echo "cryptsetup open /dev/disk/by-partlabel/cryptboot boot"
         echo "cryptsetup open /dev/disk/by-partlabel/cryptswap swap"
         echo "cryptsetup open /dev/disk/by-partlabel/cryptsystem system"
