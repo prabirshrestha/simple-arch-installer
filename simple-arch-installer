@@ -55,7 +55,7 @@ write_script() {
 		echo "    --new=2:0:+240MiB --typecode=2:8309 --change-name=2:cryptboot \\"
 		echo "    --new=3:0:+32GiB  --typecode=3:8309 --change-name=3:cryptswap \\"
 		echo "    --new=4:0:0       --typecode=4:8309 --change-name=4:cryptsystem \\"
-		echo "    \$DRIVE"
+		echo "    \$DISK"
 		echo
 		echo "mkfs.btrfs -f $device_root"
 		echo "mkfs.fat -F32 $device_boot"
