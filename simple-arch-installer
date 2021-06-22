@@ -41,20 +41,6 @@ done
 
 read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles): " DOTFILES_REPO
 
-exit
-
-# hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
-# username=$(dialog --stdout --inputbox "Enter username" 0 0) || exit 1
-# password=$(dialog --stdout --passwordbox "Enter password" 0 0) || exit 1
-# password2=$(dialog --stdout --passwordbox "Confirm password" 0 0) || exit 1
-# [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
-# dotfiles=$(dialog --stdout --inputbox "dotfiles repo (ex: prabirshrestha/dotfiles)" 0 0) || exit 1
-
-# devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
-# device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
-# device_root="${device}1"
-# device_boot="${device}2"
-
 write_script() {
 	(
 		echo "#!/usr/bin/env bash"
@@ -189,6 +175,8 @@ reset
 
 clear
 
+
+exit
 dialog --title "Arch Installer" --yesno "Are you sure you want to run the script?" 7 60
 response=$?
 clear
