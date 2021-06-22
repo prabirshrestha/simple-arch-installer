@@ -50,8 +50,8 @@ write_script() {
         echo "set -euo pipefail"
         echo
         echo "export DISK=$DISK"
-        echo "o=defaults,x-mount.mkdir"
-        echo "o_btrfs=$o,compress=zstd,ssd,noatime"
+        echo "export o=defaults,x-mount.mkdir"
+        echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
         echo
         echo "umount -fR /mnt || true"
         echo "cryptsetup close boot || true"
