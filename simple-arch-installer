@@ -52,6 +52,7 @@ write_script() {
         echo "export DISK=$DISK"
         echo "export o=defaults,x-mount.mkdir"
         echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
+        echo "export HOSTNAME=\$HOSTNAME"
         echo
         echo "umount -fR /mnt || true"
         echo "cryptsetup close boot || true"
@@ -102,7 +103,7 @@ write_script() {
         echo
         echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
         echo
-        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr networkmanager sudo vim openssh"
+        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr networkmanager sudo vim"
         echo
         echo "genfstab -U -p /mnt > /mnt/etc/fstab"
         echo
@@ -112,10 +113,21 @@ write_script() {
         echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
         echo "arch-chroot /mnt locale-gen"
         echo
-        echo "arch-chroot /mnt sh <<EOF"
-        echo "	echo ${hostname} > /etc/hostname"
-        echo "EOF"
+        echo "echo \$HOSTNAME > /mnt/etc/hostname"
         echo "arch-chroot /mnt systemctl enable NetworkManager.service"
+        echo
+        echo "arch-chroot /mnt dd bs=512 count=8 if=/dev/random of=/crypto_keyfile.bin iflag=fullblock"
+        echo "arch-chroot /mnt chmod 600 /crypto_keyfile.bin"
+        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptsystem /crypt_keyfile.bin"
+        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptswap /crypt_keyfile.bin"
+        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptboot /crypt_keyfile.bin"
+        echo "echo \"boot    UUID=\$\(/dev/disk/by-partlabel/cryptboot\)\" > /mnt/etc/crypttab"
+        echo "echo \"swap    UUID=\$\(/dev/disk/by-partlabel/cryptswap\)\" >> /mnt/etc/crypttab"
+        echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
+        echo "echo \"BINARIES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"FILES=\\\"/crypto_keyfile.bin\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"HOOKS=\\\"base systemd modconf keyboard block filesystems btrfs sd-encrypt fsck\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "arch-chroot /mnt mkinitcpio -p linux"
         echo
         echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi --recheck"
         echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
