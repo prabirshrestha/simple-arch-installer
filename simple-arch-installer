@@ -182,10 +182,10 @@ reset
 
 clear
 
-
-exit
-dialog --title "Arch Installer" --yesno "Are you sure you want to run the script?" 7 60
-response=$?
+read -p "Are you sure you want to run the archlinux installer script (YES is capital letter to run): " RUN_INSTALLER
+if [ "$RUN_INSTALLER" != 'YES' ]; then
+    exit 1
+fi
 clear
 
 case $response in
