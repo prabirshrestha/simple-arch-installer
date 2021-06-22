@@ -17,8 +17,8 @@ lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac
 read -p "Enter disk name (ex: /dev/sda): " DISK
 read -p "Overwite disk with random data (y/n): " OVERWRITE_RANDOM_DATA
 
-local password1=x
-local password2=y
+password1=x
+password2=y
 until [[ $password1 == $password2 ]]; do
     read -s -p "Enter disk password: " password1
     echo
@@ -29,8 +29,8 @@ done
 
 read -p "Enter hostname: " HOSTNAME
 read -p "Enter username: " USERNAME
-local password1=x
-local password2=y
+password1=x
+password2=y
 until [[ $password1 == $password2 ]]; do
     read -s -p "Enter user password: " password1
     echo
