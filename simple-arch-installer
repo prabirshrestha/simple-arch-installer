@@ -57,12 +57,19 @@ write_script() {
 		echo "    --new=4:0:0       --typecode=4:8309 --change-name=4:cryptsystem \\"
 		echo "    \$DISK"
 		echo
-		echo "mkfs.btrfs -f $device_root"
-		echo "mkfs.fat -F32 $device_boot"
+		echo "cryptsetup luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot"
+		echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem"
+		echo "cryptsetup luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap"
 		echo
-		echo "mount $device_root /mnt"
-		echo "mkdir -p /mnt/boot/efi"
-		echo "mount $device_boot /mnt/boot/efi"
+		echo "cryptsetup open /dev/disk/by-partlabel/cryptboot boot"
+		echo "cryptsetup open /dev/disk/by-partlabel/cryptswap swap"
+		echo "cryptsetup open /dev/disk/by-partlabel/cryptsystem system"
+		echo
+		echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
+		echo "mkfs.ext4 -L boot /dev/mapper/boot"
+		echo "mkfs.btrfs --label system /dev/mapper/system"
+		echo "mkswap -L swap /dev/mapper/swap"
+		echo "swapon -L swap"
 		echo
 		echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
 		echo
