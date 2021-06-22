@@ -90,6 +90,7 @@ write_script() {
         echo "btrfs subvolume create /mnt/@root"
         echo "btrfs subvolume create /mnt/@snapshots"
         echo "btrfs subvolume create /mnt/@tmp"
+        echo "umount -R /mnt"
         echo
         echo "mount -t btrfs -o subvol=@,$o_btrfs LABEL=system /mnt"
         echo "mount -t btrfs -o subvol=@home,$o_btrfs LABEL=system /mnt/home"
