@@ -54,10 +54,10 @@ write_script() {
         echo "o_btrfs=$o,compress=zstd,ssd,noatime"
         echo
         echo "umount -fR /mnt || true"
-        echo "cryptclose boot || true"
-        echo "cryptclose system || true"
+        echo "cryptsetup close boot || true"
+        echo "cryptsetup close system || true"
         echo "swapoff /dev/mapper/swap || true"
-        echo "cryptclose swap || true"
+        echo "cryptsetup close swap || true"
         echo
         echo "sgdisk --zap-all \$DISK"
         echo "sgdisk --new=1:0:+260MiB --typecode=1:ef00 --change-name=1:EFI \$DISK"
