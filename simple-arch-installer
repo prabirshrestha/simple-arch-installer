@@ -71,14 +71,14 @@ write_script() {
         echo "sync"
         echo
         echo "echo cryptsetup..."
-        echo "echo \$DISK_PASSWORD | cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot -d -"
-        echo "echo \$DISK_PASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem -d -"
-        echo "echo \$DISK_PASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap -d -"
+        echo "echo \$DISKPASSWORD | cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot -d -"
+        echo "echo \$DISKPASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem -d -"
+        echo "echo \$DISKPASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap -d -"
         echo
         echo "echo cryptopen..."
-        echo "echo \$DISK_PASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptboot boot -d -"
-        echo "echo \$DISK_PASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptswap swap -d -"
-        echo "echo \$DISK_PASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptsystem system -d -"
+        echo "echo \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptboot boot -d -"
+        echo "echo \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptswap swap -d -"
+        echo "echo \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptsystem system -d -"
         echo
         echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
         echo "mkfs.ext4 -L boot /dev/mapper/boot"
