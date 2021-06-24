@@ -132,10 +132,8 @@ write_script() {
         echo "sed -i 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK/' /mnt/etc/default/grub"
         echo "sed -ie 's/GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"\rd.luks.name=\$\(/dev/disk/by-partlabel/cryptboot\)=cryptsystem rd.luks.key=\$\(/dev/disk/by-partlabel/cryptboot\)=/crypto_keyfile.bin\"/' /mnt/etc/default/grub"
         echo
-        echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi --recheck"
+        echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/efi --recheck"
         echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
-        echo "mkdir -p /mnt/boot/efi/EFI/BOOT"
-        echo "cp /mnt/boot/efi/EFI/GRUB/grubx64.efi /mnt/boot/efi/EFI/BOOTX64.EFI"
         echo
         echo "# setup sudo"
         echo "arch-chroot /mnt sh <<EOF"
