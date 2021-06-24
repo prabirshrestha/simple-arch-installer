@@ -118,9 +118,9 @@ write_script() {
         echo
         echo "arch-chroot /mnt dd bs=512 count=8 if=/dev/random of=/crypto_keyfile.bin iflag=fullblock"
         echo "arch-chroot /mnt chmod 600 /crypto_keyfile.bin"
-        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptsystem /crypt_keyfile.bin"
-        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptswap /crypt_keyfile.bin"
-        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptboot /crypt_keyfile.bin"
+        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptsystem /crypto_keyfile.bin"
+        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptswap /crypto_keyfile.bin"
+        echo "arch-chroot /mnt cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptboot /crypto_keyfile.bin"
         echo "echo \"boot    UUID=\$\(/dev/disk/by-partlabel/cryptboot\)\" > /mnt/etc/crypttab"
         echo "echo \"swap    UUID=\$\(/dev/disk/by-partlabel/cryptswap\)\" >> /mnt/etc/crypttab"
         echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
@@ -128,6 +128,9 @@ write_script() {
         echo "echo \"FILES=\\\"/crypto_keyfile.bin\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "echo \"HOOKS=\\\"base systemd modconf keyboard block filesystems btrfs sd-encrypt fsck\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "arch-chroot /mnt mkinitcpio -p linux"
+        echo
+        echo "sed -i 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK/' /mnt/etc/default/grub"
+        echo "sed -ie 's/GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"\rd.luks.name=\$\(/dev/disk/by-partlabel/cryptboot\)=cryptsystem rd.luks.key=\$\(/dev/disk/by-partlabel/cryptboot\)=/crypto_keyfile.bin\"/' /mnt/etc/default/grub"
         echo
         echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi --recheck"
         echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
