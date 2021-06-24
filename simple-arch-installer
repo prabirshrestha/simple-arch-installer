@@ -53,6 +53,8 @@ write_script() {
         echo "export o=defaults,x-mount.mkdir"
         echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
         echo "export HOSTNAME=\$HOSTNAME"
+        echo "read -s -p \"Enter disk password: \" DISKPASSWORD"
+        echo "read -s -p \"Enter user password: \" USERPASSWORD"
         echo
         echo "umount -fR /mnt || true"
         echo "cryptsetup close boot || true"
@@ -69,14 +71,14 @@ write_script() {
         echo "sync"
         echo
         echo "echo cryptsetup..."
-        echo "cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot"
-        echo "cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem"
-        echo "cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap"
+        echo "echo \$DISK_PASSWORD | cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot -d -"
+        echo "echo \$DISK_PASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem -d -"
+        echo "echo \$DISK_PASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap -d -"
         echo
         echo "echo cryptopen..."
-        echo "cryptsetup open /dev/disk/by-partlabel/cryptboot boot"
-        echo "cryptsetup open /dev/disk/by-partlabel/cryptswap swap"
-        echo "cryptsetup open /dev/disk/by-partlabel/cryptsystem system"
+        echo "echo \$DISK_PASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptboot boot -d -"
+        echo "echo \$DISK_PASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptswap swap -d -"
+        echo "echo \$DISK_PASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptsystem system -d -"
         echo
         echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
         echo "mkfs.ext4 -L boot /dev/mapper/boot"
@@ -207,7 +209,7 @@ write_script() {
         echo
         echo "# create user password"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "	echo -e "$password"\"\\n\"$password | passwd \"$username\""
+        echo "	echo -e "\$USERPASSWORD"\"\\n\"\$USERPASSWORD | passwd \"$username\""
         echo "EOF"
         echo
         echo "# disallow root login"
