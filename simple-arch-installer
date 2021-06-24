@@ -54,7 +54,9 @@ write_script() {
         echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
         echo "export HOSTNAME=\$HOSTNAME"
         echo "read -s -p \"Enter disk password: \" DISKPASSWORD"
+        echo "echo"
         echo "read -s -p \"Enter user password: \" USERPASSWORD"
+        echo "echo"
         echo
         echo "umount -fR /mnt || true"
         echo "cryptsetup close boot || true"
