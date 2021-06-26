@@ -121,8 +121,8 @@ write_script() {
         echo "arch-chroot /mnt systemctl enable NetworkManager.service"
         echo
         echo "arch-chroot /mnt sh <<EOF"
-        echo "  mkdir /etc/luks"
-        echo "  dd bs=512 count=8 if=/dev/random of=/etc/luks/boot.keyfile ifflag=fullblock"
+        echo "  mkdir -p /etc/luks"
+        echo "  dd bs=512 count=8 if=/dev/random of=/etc/luks/boot.keyfile"
         echo "  chmod 600 /etc/luks/boot.keyfile"
         echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptsystem /etc/luks/boot.keyfile"
         echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptswap /etc/luks/boot.keyfile"
