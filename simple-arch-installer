@@ -13,33 +13,34 @@ EDITOR=vim
 
 timedatectl set-ntp true
 
+sleep 3
+echo
+
 lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac
 read -p "Enter disk name (ex: /dev/sda): " DISK
 read -p "Overwite disk with random data (y/n): " OVERWRITE_RANDOM_DATA
 
-password1=x
-password2=y
-until [[ $password1 == $password2 ]]; do
-    read -s -p "Enter disk password: " password1
-    echo
-    read -s -p "Confirm disk password: " password2
-    echo
-    DISK_PASSWORD=$password1
-done
+# password1=x
+# password2=y
+# until [[ $password1 == $password2 ]]; do
+#     read -s -p "Enter disk password: " password1
+#     echo
+#     read -s -p "Confirm disk password: " password2
+#     echo
+#     DISK_PASSWORD=$password1
+# done
 
 read -p "Enter hostname: " HOSTNAME
 read -p "Enter username: " USERNAME
-password1=x
-password2=y
-until [[ $password1 == $password2 ]]; do
-    read -s -p "Enter user password: " password1
-    echo
-    read -s -p "Confirm user password: " password2
-    echo
-    USER_PASSWORD=$password1
-done
-
-read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles): " DOTFILES_REPO
+# password1=x
+# password2=y
+# until [[ $password1 == $password2 ]]; do
+#     read -s -p "Enter user password: " password1
+#     echo
+#     read -s -p "Confirm user password: " password2
+#     echo
+#     USER_PASSWORD=$password1
+# done
 
 write_script() {
 	(
@@ -50,6 +51,9 @@ write_script() {
         echo "set -euo pipefail"
         echo
         echo "export DISK=$DISK"
+        echo "export OVERWRITE_RANDOM_DATA=$OVERWRITE_RANDOM_DATA"
+        echo "export USERNAME=$USERNAME"
+        echo "export HOSTNAME=$HOSTNAME"
         echo "export o=defaults,x-mount.mkdir"
         echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
         echo "export HOSTNAME=\$HOSTNAME"
@@ -57,6 +61,7 @@ write_script() {
         echo "echo"
         echo "read -s -p \"Enter user password: \" USERPASSWORD"
         echo "echo"
+        echo "read -p \"Enter dotfiles repository (ex: prabirshrestha/dotfiles): \" DOTFILES_REPO"
         echo
         echo "umount -fR /mnt || true"
         echo "cryptsetup close boot || true"
@@ -149,8 +154,8 @@ write_script() {
         echo
         echo "# create user"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "	useradd -Nm -g users -G wheel,sys \"$username\""
-        echo "  passwd -d \"$username\""
+        echo "	useradd -Nm -g users -G wheel,sys \"\$USERNAME\""
+        echo "  passwd -d \"\$USERNAME\""
         echo "EOF"
         echo
         echo "# install paru-bin"
@@ -160,11 +165,11 @@ write_script() {
         echo "  tar -xvf paru-bin.tar.gz"
         echo "  chmod 777 paru-bin"
         echo "  cd paru-bin"
-        echo "  su $username"
+        echo "  su \$USERNAME"
         echo "  makepkg -sirc --noconfirm"
         echo "EOF"
         echo
-        echo "arch-chroot /mnt sudo -u $username paru --noconfirm -S wezterm-bin nerd-fonts-fira-code lua z.lua"
+        echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S wezterm-bin nerd-fonts-fira-code lua z.lua"
         echo
         echo "# install gui"
         echo "arch-chroot /mnt bash <<EOF"
@@ -177,10 +182,10 @@ write_script() {
         echo "  # acpid for battery status"
         echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
         echo
-        echo "  #su $username -c 'paru -S --noconfirm dwm-git'"
+        echo "  #su \$USERNAME -c 'paru -S --noconfirm dwm-git'"
         echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
         echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
-        echo "  #su $username -c 'paru -S --noconfirm lemonbar-git'"
+        echo "  #su \$USERNAME -c 'paru -S --noconfirm lemonbar-git'"
         echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
         echo "  #pacman -S --noconfirm xfce4"
         echo "  #pacman -S --noconfirm plasma konsole"
@@ -199,22 +204,22 @@ write_script() {
         echo "  pacman -S --noconfirm gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
         echo "  pacman -S --noconfirm virtualbox"
         echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
-        echo "  pacman -S --noconfirm docker; usermod -aG docker $username; systemctl enable docker.service"
+        echo "  pacman -S --noconfirm docker; usermod -aG docker \$USERNAME; systemctl enable docker.service"
         echo "EOF"
         echo
         echo "arch-chroot /mnt bash <<EOF"
         echo "  pacman -Syu --noconfirm --needed git"
-        echo "  cd /home/$username"
+        echo "  cd /home/\$USERNAME"
         echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
         echo "  tar -xvf ./dot.tar.gz"
         echo "  rm ./dot.tar.gz"
         echo "  mv ./dot /bin/"
-        echo "  su $username -c 'dot init $dotfiles'"
+        echo "  if [ \$DOTFILES_REPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILES_REPO'; fi;"
         echo "EOF"
         echo
         echo "# create user password"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "	echo -e "\$USERPASSWORD"\"\\n\"\$USERPASSWORD | passwd \"$username\""
+        echo "	echo -e "\$USERPASSWORD"\"\\n\"\$USERPASSWORD | passwd \"\$USERNAME\""
         echo "EOF"
         echo
         echo "# disallow root login"
