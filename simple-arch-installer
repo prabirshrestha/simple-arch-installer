@@ -132,7 +132,7 @@ write_script() {
         echo "echo \"swap    UUID=\$\(/dev/disk/by-partlabel/cryptswap\)\" >> /mnt/etc/crypttab"
         echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
         echo "echo \"BINARIES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
-        echo "echo \"FILES=\\\"/crypto_keyfile.bin\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"FILES=\\\"/etc/luks/boot.keyfile\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "echo \"HOOKS=\\\"base systemd modconf keyboard block filesystems btrfs sd-encrypt fsck\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "arch-chroot /mnt mkinitcpio -p linux"
         echo
