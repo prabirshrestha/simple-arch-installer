@@ -137,7 +137,7 @@ write_script() {
         echo "arch-chroot /mnt mkinitcpio -p linux"
         echo
         echo "sed -i 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/' /mnt/etc/default/grub"
-        echo "sed -ie 's/GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"rd.luks.name='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=cryptsystem rd.luks.key='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=\\/crypto_keyfile.bin\"/' /mnt/etc/default/grub"
+        echo "sed -ie 's/GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"rd.luks.name='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=cryptsystem rd.luks.key='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=\\/etc/luks/boot.keyfile\"/' /mnt/etc/default/grub"
         echo
         echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/efi --recheck"
         echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
