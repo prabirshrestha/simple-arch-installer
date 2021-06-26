@@ -154,7 +154,7 @@ write_script() {
         echo
         echo "# create user"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "	useradd -Nm -g users -G wheel,sys \"\$USERNAME\""
+        echo "  useradd -Nm -g users -G wheel,sys \"\$USERNAME\""
         echo "  passwd -d \"\$USERNAME\""
         echo "EOF"
         echo
@@ -219,7 +219,7 @@ write_script() {
         echo
         echo "# create user password"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "	echo -e "\$USERPASSWORD"\"\\n\"\$USERPASSWORD | passwd \"\$USERNAME\""
+        echo "  echo -e "\$USERPASSWORD"\"\\n\"\$USERPASSWORD | passwd \"\$USERNAME\""
         echo "EOF"
         echo
         echo "# disallow root login"
