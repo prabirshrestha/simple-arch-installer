@@ -3,8 +3,11 @@
 # To connect to wifi:
 #	wifi-menu or nmtui
 # To install big font:
+#   setfont solar24x32
 # 	pacman -Sy terminus-font
 # 	setfont ter-p32n
+# To copy archlinux ios to device
+#   dd if=archlinux.iso of=/dev/sdb bs=4M
 set -eo pipefail
 trap quit:no_message INT
 
