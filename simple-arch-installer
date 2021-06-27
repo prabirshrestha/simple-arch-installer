@@ -18,29 +18,10 @@ echo
 
 lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac
 read -p "Enter disk name (ex: /dev/sda): " DISK
-read -p "Overwite disk with random data (y/n): " OVERWRITE_RANDOM_DATA
-
-# password1=x
-# password2=y
-# until [[ $password1 == $password2 ]]; do
-#     read -s -p "Enter disk password: " password1
-#     echo
-#     read -s -p "Confirm disk password: " password2
-#     echo
-#     DISK_PASSWORD=$password1
-# done
-
+read -p "Full disk wipe (y/n): " FULLDISKWIPE
 read -p "Enter hostname: " HOSTNAME
 read -p "Enter username: " USERNAME
-# password1=x
-# password2=y
-# until [[ $password1 == $password2 ]]; do
-#     read -s -p "Enter user password: " password1
-#     echo
-#     read -s -p "Confirm user password: " password2
-#     echo
-#     USER_PASSWORD=$password1
-# done
+read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles): " DOTFILES_REPO
 
 write_script() {
 	(
@@ -51,17 +32,30 @@ write_script() {
         echo "set -euo pipefail"
         echo
         echo "export DISK=$DISK"
-        echo "export OVERWRITE_RANDOM_DATA=$OVERWRITE_RANDOM_DATA"
+        echo "export FULLDISKWIPE=$FULLDISKWIPE"
         echo "export USERNAME=$USERNAME"
         echo "export HOSTNAME=$HOSTNAME"
         echo "export o=defaults,x-mount.mkdir"
         echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
         echo "export HOSTNAME=\$HOSTNAME"
-        echo "read -s -p \"Enter disk password: \" DISKPASSWORD"
-        echo "echo"
-        echo "read -s -p \"Enter user password: \" USERPASSWORD"
-        echo "echo"
-        echo "read -p \"Enter dotfiles repository (ex: prabirshrestha/dotfiles): \" DOTFILES_REPO"
+        echo "password1=x"
+        echo "password2=y"
+        echo "until [[ \$password1 == \$password2 ]]; do"
+        echo "  read -s -p \"Enter disk password: \" password1"
+        echo "  echo"
+        echo "  read -s -p \"Enter disk password: \" password2"
+        echo "  echo"
+        echo "  DISKPASSWORD=\$password1"
+        echo "done"
+        echo "password1=x"
+        echo "password2=y"
+        echo "until [[ \$password1 == \$password2 ]]; do"
+        echo "  read -s -p \"Enter user password: \" password1"
+        echo "  echo"
+        echo "  read -s -p \"Enter user password: \" password2"
+        echo "  echo"
+        echo "  USERPASSWORD=\$password1"
+        echo "done"
         echo
         echo "umount -fR /mnt || true"
         echo "cryptsetup close boot || true"
@@ -86,6 +80,10 @@ write_script() {
         echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptboot boot -d -"
         echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptswap swap -d -"
         echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptsystem system -d -"
+        echo
+        echo "if [ \$FULLDISKWIPE != \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptboot status=progress bs=4M; fi;"
+        echo "if [ \$FULLDISKWIPE != \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptswap status=progress bs=4M; fi;"
+        echo "if [ \$FULLDISKWIPE != \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptsystem status=progress bs=4M; fi;"
         echo
         echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
         echo "mkfs.ext4 -L boot /dev/mapper/boot"
@@ -133,8 +131,8 @@ write_script() {
         echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptswap /etc/luks/boot.keyfile"
         echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptboot /etc/luks/boot.keyfile"
         echo "EOF"
-        echo "echo \"boot    UUID=\$\(lsblk -dno UUID /dev/disk/by-partlabel/cryptboot\)    /etc/luks/boot.keyfile\" > /mnt/etc/crypttab"
-        echo "echo \"swap    UUID=\$\(lsblk -dno UUID /dev/disk/by-partlabel/cryptswap\)    /etc/luks/boot.keyfile\" >> /mnt/etc/crypttab"
+        echo "echo \"boot    UUID=\$\(lsblk -dno UUID /dev/disk/by-partlabel/cryptboot\)\" > /mnt/etc/crypttab"
+        echo "echo \"swap    UUID=\$\(lsblk -dno UUID /dev/disk/by-partlabel/cryptswap\)\" >> /mnt/etc/crypttab"
         echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
         echo "echo \"BINARIES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "echo \"FILES=\\\"/etc/luks/boot.keyfile\\\"\" >> /mnt/etc/mkinitcpio.conf"
