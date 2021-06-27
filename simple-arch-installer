@@ -111,7 +111,7 @@ write_script() {
         echo
         echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
         echo
-        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr networkmanager sudo vim"
+        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr networkmanager sudo"
         echo
         echo "genfstab -U -p /mnt > /mnt/etc/fstab"
         echo
@@ -168,7 +168,7 @@ write_script() {
         echo "  makepkg -sirc --noconfirm"
         echo "EOF"
         echo
-        echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S wezterm-bin nerd-fonts-fira-code lua z.lua"
+        echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S wezterm-bin nerd-fonts-fira-code"
         echo
         echo "# install gui"
         echo "arch-chroot /mnt bash <<EOF"
@@ -200,7 +200,7 @@ write_script() {
         echo
         echo "# dev"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "  pacman -S --noconfirm gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
+        echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
         echo "  pacman -S --noconfirm virtualbox"
         echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
         echo "  pacman -S --noconfirm docker; usermod -aG docker \$USERNAME; systemctl enable docker.service"
