@@ -81,9 +81,9 @@ write_script() {
         echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptswap swap -d -"
         echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptsystem system -d -"
         echo
-        echo "if [ \$FULLDISKWIPE != \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptboot status=progress bs=4M; fi;"
-        echo "if [ \$FULLDISKWIPE != \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptswap status=progress bs=4M; fi;"
-        echo "if [ \$FULLDISKWIPE != \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptsystem status=progress bs=4M; fi;"
+        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptboot status=progress bs=4M; fi;"
+        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptswap status=progress bs=4M; fi;"
+        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptsystem status=progress bs=4M; fi;"
         echo
         echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
         echo "mkfs.ext4 -L boot /dev/mapper/boot"
