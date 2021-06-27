@@ -170,6 +170,19 @@ write_script() {
         echo
         echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S wezterm-bin nerd-fonts-fira-code"
         echo
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  pacman -S --noconfirm ufw"
+        echo "  ufw default allow outgoing"
+        echo "  ufw default deny incoming"
+        echo "  ufw limit ssh"
+        echo "  #ufw allow http"
+        echo "  #ufw allow https"
+        echo "  ufw enable"
+        echo "  ufw status verbose"
+        echo "  systemctl start ufw"
+        echo "  systemctl enable ufw"
+        echo "EOF"
+        echo
         echo "# install gui"
         echo "arch-chroot /mnt bash <<EOF"
         echo "  pacman -S --noconfirm xf86-video-intel"
