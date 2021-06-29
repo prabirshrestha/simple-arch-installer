@@ -3,155 +3,244 @@
 # To connect to wifi:
 #	wifi-menu or nmtui
 # To install big font:
+#   setfont solar24x32
 # 	pacman -Sy terminus-font
 # 	setfont ter-p32n
+# To copy archlinux ios to device
+#   dd if=archlinux.iso of=/dev/sdb bs=4M
 set -eo pipefail
 trap quit:no_message INT
 
-command -v dialog >/dev/null 2>&1 || pacman -Sy --noconfirm --needed dialog
-
 INSTALL_SCRIPT=install_arch.sh
 EDITOR=vim
-hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
-username=$(dialog --stdout --inputbox "Enter username" 0 0) || exit 1
-password=$(dialog --stdout --passwordbox "Enter password" 0 0) || exit 1
-password2=$(dialog --stdout --passwordbox "Confirm password" 0 0) || exit 1
-[[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
-dotfiles=$(dialog --stdout --inputbox "dotfiles repo (ex: prabirshrestha/dotfiles)" 0 0) || exit 1
 
-devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
-device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
-device_root="${device}1"
-device_boot="${device}2"
+timedatectl set-ntp true
+
+sleep 3
+echo
+
+lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac
+read -p "Enter disk name (ex: /dev/sda): " DISK
+read -p "Full disk wipe (y/n): " FULLDISKWIPE
+read -p "Enter hostname: " HOSTNAME
+read -p "Enter username: " USERNAME
+read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles): " DOTFILESREPO
 
 write_script() {
 	(
-		echo "#!/usr/bin/env bash"
-		echo "#"
-		echo "# Please review the install script below"
-		echo "#"
-		echo "set -euo pipefail"
-		echo
-		echo "sgdisk -Z $device"
-		echo "sgdisk -Z $device"
-		echo "sgdisk -z $device"
-		echo "sgdisk -o $device"
-		echo
-		echo "sgdisk -n 1:0:-200M $device"
-		echo "sgdisk -t 1:8300 $device"
-		echo
-		echo "sgdisk -n 2:-200M:-0 $device"
-		echo "sgdisk -t 2:ef00 $device"
-		echo "sgdisk -A 2:set:2 $device"
-		echo
-		echo "mkfs.btrfs -f $device_root"
-		echo "mkfs.fat -F32 $device_boot"
-		echo
-		echo "mount $device_root /mnt"
-		echo "mkdir -p /mnt/boot/efi"
-		echo "mount $device_boot /mnt/boot/efi"
-		echo
-		echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
-		echo
-		echo "pacstrap /mnt base base-devel linux linux-firmware grub efibootmgr networkmanager sudo vim"
-		echo
-		echo "genfstab -U -p /mnt > /mnt/etc/fstab"
-		echo
-		echo "ln -sf /mnt/usr/share/zoneinfo/America/Los_Angeles /mnt/etc/localtime"
-		echo
-		echo "echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf"
-		echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
-		echo "arch-chroot /mnt locale-gen"
-		echo
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	echo ${hostname} > /etc/hostname"
-		echo "EOF"
-		echo "arch-chroot /mnt systemctl enable NetworkManager.service"
-		echo
-		echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi --recheck"
-		echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
-		echo "mkdir -p /mnt/boot/efi/EFI/BOOT"
-		echo "cp /mnt/boot/efi/EFI/GRUB/grubx64.efi /mnt/boot/efi/EFI/BOOTX64.EFI"
-		echo
-		echo "# setup sudo"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	echo '%wheel ALL=(ALL) ALL' | sudo EDITOR='tee -a' visudo"
-		echo "EOF"
-		echo
-		echo "# create user"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	useradd -Nm -g users -G wheel,sys \"$username\""
-		echo "  passwd -d \"$username\""
-		echo "EOF"
-		echo
-		echo "# install paru-bin"
-		echo "arch-chroot /mnt bash <<EOF"
-		echo "  cd /tmp"
-		echo "  curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz"
-		echo "  tar -xvf paru-bin.tar.gz"
-		echo "  chmod 777 paru-bin"
-		echo "  cd paru-bin"
-		echo "  su $username"
-		echo "  makepkg -sirc --noconfirm"
-		echo "EOF"
-		echo
-		echo "arch-chroot /mnt sudo -u $username paru --noconfirm -S wezterm-bin nerd-fonts-fira-code lua z.lua"
-		echo
-		echo "# install gui"
-		echo "arch-chroot /mnt bash <<EOF"
-		echo "  pacman -S --noconfirm xf86-video-intel"
-		echo "  #pacman -S --noconfirm xf86-video-nouveau"
-		echo
-		echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
-		echo
-		echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
+        echo "#!/usr/bin/env bash"
+        echo "#"
+        echo "# Please review the install script below"
+        echo "#"
+        echo "set -euo pipefail"
+        echo
+        echo "export DISK=$DISK"
+        echo "export FULLDISKWIPE=$FULLDISKWIPE"
+        echo "export USERNAME=$USERNAME"
+        echo "export HOSTNAME=$HOSTNAME"
+        echo "export DOTFILESREPO=$DOTFILESREPO"
+        echo "export o=defaults,x-mount.mkdir"
+        echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
+        echo "export HOSTNAME=\$HOSTNAME"
+        echo "password1=x"
+        echo "password2=y"
+        echo "until [[ \$password1 == \$password2 ]]; do"
+        echo "  read -s -p \"Enter disk password: \" password1"
+        echo "  echo"
+        echo "  read -s -p \"Re-Enter disk password: \" password2"
+        echo "  echo"
+        echo "  DISKPASSWORD=\$password1"
+        echo "done"
+        echo "password1=x"
+        echo "password2=y"
+        echo "until [[ \$password1 == \$password2 ]]; do"
+        echo "  read -s -p \"Enter user password: \" password1"
+        echo "  echo"
+        echo "  read -s -p \"Re-Enter user password: \" password2"
+        echo "  echo"
+        echo "  USERPASSWORD=\$password1"
+        echo "done"
+        echo
+        echo "umount -fR /mnt || true"
+        echo "cryptsetup close boot || true"
+        echo "cryptsetup close system || true"
+        echo "swapoff /dev/mapper/swap || true"
+        echo "cryptsetup close swap || true"
+        echo
+        echo "sgdisk --zap-all \$DISK"
+        echo "sgdisk --new=1:0:+260MiB --typecode=1:ef00 --change-name=1:EFI \$DISK"
+        echo "sgdisk --new=2:0:+240MiB --typecode=2:8309 --change-name=2:cryptboot \$DISK"
+        echo "sgdisk --new=3:0:+32GiB  --typecode=3:8309 --change-name=3:cryptswap \$DISK"
+        echo "sgdisk --new=4:0:0       --typecode=4:8309 --change-name=4:cryptsystem \$DISK"
+        echo "sleep 1"
+        echo "sync"
+        echo
+        echo "echo cryptsetup..."
+        echo "echo -n \$DISKPASSWORD | cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot -d -"
+        echo "echo -n \$DISKPASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem -d -"
+        echo "echo -n \$DISKPASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap -d -"
+        echo
+        echo "echo cryptopen..."
+        echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptboot boot -d -"
+        echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptswap swap -d -"
+        echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptsystem system -d -"
+        echo
+        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptboot status=progress bs=4M &> /dev/null; fi;"
+        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptswap status=progress bs=4M &> /dev/null; fi;"
+        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptsystem status=progress bs=4M &> /dev/null; fi;"
+        echo
+        echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
+        echo "mkfs.ext4 -L boot /dev/mapper/boot"
+        echo "mkfs.btrfs --label system /dev/mapper/system"
+        echo "mkswap -L swap /dev/mapper/swap"
+        echo "swapon -L swap"
+        echo
+        echo "mount -t btrfs LABEL=system /mnt"
+        echo "btrfs subvolume create /mnt/@"
+        echo "btrfs subvolume create /mnt/@home"
+        echo "btrfs subvolume create /mnt/@log"
+        echo "btrfs subvolume create /mnt/@root"
+        echo "btrfs subvolume create /mnt/@snapshots"
+        echo "btrfs subvolume create /mnt/@tmp"
+        echo "umount -R /mnt"
+        echo
+        echo "mount -t btrfs -o subvol=@,\$o_btrfs LABEL=system /mnt"
+        echo "mount -t btrfs -o subvol=@home,\$o_btrfs LABEL=system /mnt/home"
+        echo "mount -t btrfs -o subvol=@log,\$o_btrfs LABEL=system /mnt/var/log"
+        echo "mount -t btrfs -o subvol=@root,\$o_btrfs LABEL=system /mnt/root"
+        echo "mount -t btrfs -o subvol=@tmp,\$o_btrfs LABEL=system /mnt/var/tmp"
+        echo "mount -t vfat -o \$o LABEL=EFI /mnt/efi"
+        echo "mount -t ext4 -o \$o LABEL=boot /mnt/boot"
+        echo
+        echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
+        echo
+        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr networkmanager sudo"
+        echo
+        echo "genfstab -U -p /mnt > /mnt/etc/fstab"
+        echo
+        echo "ln -sf /mnt/usr/share/zoneinfo/America/Los_Angeles /mnt/etc/localtime"
+        echo
+        echo "echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf"
+        echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
+        echo "arch-chroot /mnt locale-gen"
+        echo
+        echo "echo \$HOSTNAME > /mnt/etc/hostname"
+        echo "arch-chroot /mnt systemctl enable NetworkManager.service"
+        echo
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  mkdir -p /etc/luks"
+        echo "  dd bs=512 count=8 if=/dev/random of=/etc/luks/boot.keyfile iflag=fullblock"
+        echo "  chmod 600 /etc/luks/boot.keyfile"
+        echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptsystem /etc/luks/boot.keyfile"
+        echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptswap /etc/luks/boot.keyfile"
+        echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptboot /etc/luks/boot.keyfile"
+        echo "EOF"
+        echo "echo \"boot  UUID=\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptboot) /etc/luks/boot.keyfile\" > /mnt/etc/crypttab"
+        echo "echo \"swap  UUID=\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptswap) /etc/luks/boot.keyfile\" >> /mnt/etc/crypttab"
+        echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
+        echo "echo \"BINARIES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"FILES=\\\"/etc/luks/boot.keyfile\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"HOOKS=\\\"base systemd modconf keyboard block filesystems btrfs sd-encrypt fsck\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "arch-chroot /mnt mkinitcpio -p linux"
+        echo
+        echo "sed -i 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/' /mnt/etc/default/grub"
+        echo "sed -ie 's/GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"rd.luks.name='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=cryptsystem rd.luks.key='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=\\/etc\\/luks\\/boot.keyfile\"/' /mnt/etc/default/grub"
+        echo
+        echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/efi --recheck"
+        echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
+        echo
+        echo "# setup sudo"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "	echo '%wheel ALL=(ALL) ALL' | sudo EDITOR='tee -a' visudo"
+        echo "EOF"
+        echo
+        echo "# create user"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  useradd -Nm -g users -G wheel,sys \"\$USERNAME\""
+        echo "  passwd -d \"\$USERNAME\""
+        echo "EOF"
+        echo
+        echo "# install paru-bin"
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  cd /tmp"
+        echo "  curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz"
+        echo "  tar -xvf paru-bin.tar.gz"
+        echo "  chmod 777 paru-bin"
+        echo "  cd paru-bin"
+        echo "  su \$USERNAME"
+        echo "  makepkg -sirc --noconfirm"
+        echo "EOF"
+        echo
+        echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S wezterm-bin nerd-fonts-fira-code"
+        echo
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  pacman -S --noconfirm ufw"
+        echo "  ufw default allow outgoing"
+        echo "  ufw default deny incoming"
+        echo "  ufw limit ssh"
+        echo "  #ufw allow http"
+        echo "  #ufw allow https"
+        echo "  ufw enable"
+        echo "  ufw status verbose"
+        echo "  systemctl start ufw"
+        echo "  systemctl enable ufw"
+        echo "EOF"
+        echo
+        echo "# install gui"
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  pacman -S --noconfirm xf86-video-intel"
+        echo "  #pacman -S --noconfirm xf86-video-nouveau"
+        echo
+        echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
+        echo
+        echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo "  # acpid for battery status"
-		echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
-		echo
-		echo "  #su $username -c 'paru -S --noconfirm dwm-git'"
-		echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
-		echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
-		echo "  #su $username -c 'paru -S --noconfirm lemonbar-git'"
-		echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
-		echo "  #pacman -S --noconfirm xfce4"
-		echo "  #pacman -S --noconfirm plasma konsole"
-		echo
-		echo "  pacman -S --noconfirm firefox-developer-edition"
-		echo
-		echo "  #xbacklight -set 100"
-		echo "EOF"
-		echo
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "  pacman -S --noconfirm fuse"
-		echo "EOF"
-		echo
-		echo "# dev"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "  pacman -S --noconfirm gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
-		echo "  pacman -S --noconfirm virtualbox"
-		echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
-		echo "  pacman -S --noconfirm docker; usermod -aG docker $username; systemctl enable docker.service"
-		echo "EOF"
-		echo
-		echo "arch-chroot /mnt bash <<EOF"
-		echo "  pacman -Syu --noconfirm --needed git"
-		echo "  cd /home/$username"
-		echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
-		echo "  tar -xvf ./dot.tar.gz"
-		echo "  rm ./dot.tar.gz"
-		echo "  mv ./dot /bin/"
-		echo "  su $username -c 'dot init $dotfiles'"
-		echo "EOF"
-		echo
-		echo "# create user password"
-		echo "arch-chroot /mnt sh <<EOF"
-		echo "	echo -e "$password"\"\\n\"$password | passwd \"$username\""
-		echo "EOF"
-		echo
-		echo "# disallow root login"
-		echo "arch-chroot /mnt passwd -l root"
-	) > "$INSTALL_SCRIPT"
-	chmod +x "$INSTALL_SCRIPT"
+        echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
+        echo
+        echo "  #su \$USERNAME -c 'paru -S --noconfirm dwm-git'"
+        echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
+        echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
+        echo "  #su \$USERNAME -c 'paru -S --noconfirm lemonbar-git'"
+        echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
+        echo "  #pacman -S --noconfirm xfce4"
+        echo "  #pacman -S --noconfirm plasma konsole"
+        echo
+        echo "  pacman -S --noconfirm firefox-developer-edition"
+        echo
+        echo "  #xbacklight -set 100"
+        echo "EOF"
+        echo
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  pacman -S --noconfirm fuse"
+        echo "EOF"
+        echo
+        echo "# dev"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
+        echo "  pacman -S --noconfirm virtualbox"
+        echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
+        echo "  pacman -S --noconfirm docker; usermod -aG docker \$USERNAME; systemctl enable docker.service"
+        echo "EOF"
+        echo
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  pacman -Syu --noconfirm --needed git"
+        echo "  cd /home/\$USERNAME"
+        echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
+        echo "  tar -xvf ./dot.tar.gz"
+        echo "  rm ./dot.tar.gz"
+        echo "  mv ./dot /bin/"
+        echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; fi;"
+        echo "EOF"
+        echo
+        echo "# create user password"
+        echo "arch-chroot /mnt sh <<EOF"
+        echo "  echo -e "\$USERPASSWORD"\"\\n\"\$USERPASSWORD | passwd \"\$USERNAME\""
+        echo "EOF"
+        echo
+        echo "# disallow root login"
+        echo "arch-chroot /mnt passwd -l root"
+    ) > "$INSTALL_SCRIPT"
+    chmod +x "$INSTALL_SCRIPT"
 }
 
 write_script
@@ -162,12 +251,9 @@ reset
 
 clear
 
-dialog --title "Arch Installer" --yesno "Are you sure you want to run the script?" 7 60
-response=$?
-clear
-
-case $response in
-	0) bash "$INSTALL_SCRIPT";;
-	1) clear && echo "Cancelling installation";;
-	255) clear && echo "Cancelling installation";;
-esac
+read -p "Are you sure you want to run the archlinux installer script (YES is capital letter to run): " RUN_INSTALLER
+if [ "$RUN_INSTALLER" == "YES" ]; then
+    bash "$INSTALL_SCRIPT"
+else
+    echo "Cancelling installation"
+fi
