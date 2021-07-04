@@ -229,7 +229,7 @@ write_script() {
         echo "  tar -xvf ./dot.tar.gz"
         echo "  rm ./dot.tar.gz"
         echo "  mv ./dot /bin/"
-        echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; fi;"
+        echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; cd .dotfiles; git submodule update --init --recursive; fi;"
         echo "EOF"
         echo
         echo "# create user password"
