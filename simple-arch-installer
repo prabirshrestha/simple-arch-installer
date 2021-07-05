@@ -1,13 +1,11 @@
 #!/bin/bash
 
 # To connect to wifi:
-#	wifi-menu or nmtui
+#    iwctl station wlan0 connect "networkname"
 # To install big font:
-#   setfont solar24x32
-# 	pacman -Sy terminus-font
-# 	setfont ter-p32n
+#    setfont solar24x32
 # To copy archlinux ios to device
-#   dd if=archlinux.iso of=/dev/sdb bs=4M
+#    dd if=archlinux.iso of=/dev/sdb bs=4M
 set -eo pipefail
 trap quit:no_message INT
 
@@ -114,7 +112,7 @@ write_script() {
         echo
         echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
         echo
-        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr networkmanager sudo"
+        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr dhcpcd iwd sudo"
         echo
         echo "genfstab -U -p /mnt > /mnt/etc/fstab"
         echo
@@ -125,7 +123,7 @@ write_script() {
         echo "arch-chroot /mnt locale-gen"
         echo
         echo "echo \$HOSTNAME > /mnt/etc/hostname"
-        echo "arch-chroot /mnt systemctl enable NetworkManager.service"
+        echo "arch-chroot /mnt systemctl enable dhcpcd iwd"
         echo
         echo "arch-chroot /mnt sh <<EOF"
         echo "  mkdir -p /etc/luks"
