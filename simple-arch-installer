@@ -178,9 +178,8 @@ write_script() {
         echo "  ufw limit ssh"
         echo "  #ufw allow http"
         echo "  #ufw allow https"
-        echo "  ufw enable"
+        echo "  #ufw enable"
         echo "  ufw status verbose"
-        echo "  systemctl start ufw"
         echo "  systemctl enable ufw"
         echo "EOF"
         echo
