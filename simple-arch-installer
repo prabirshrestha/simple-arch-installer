@@ -19,6 +19,8 @@ echo
 
 lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac
 read -p "Enter disk name (ex: /dev/sda): " DISK
+grep MemTotal /proc/meminfo
+read -p "Enter swap size (ex: 0 or 1024MiB or 8GiB): " SWAPSIZE
 read -p "Full disk wipe (y/n): " FULLDISKWIPE
 read -p "Enter hostname: " HOSTNAME
 read -p "Enter username: " USERNAME
@@ -33,6 +35,7 @@ write_script() {
         echo "set -euo pipefail"
         echo
         echo "export DISK=$DISK"
+        echo "export SWAPSIZE=$SWAPSIZE"
         echo "export FULLDISKWIPE=$FULLDISKWIPE"
         echo "export USERNAME=$USERNAME"
         echo "export HOSTNAME=$HOSTNAME"
@@ -66,10 +69,10 @@ write_script() {
         echo "cryptsetup close swap || true"
         echo
         echo "sgdisk --zap-all \$DISK"
-        echo "sgdisk --new=1:0:+260MiB --typecode=1:ef00 --change-name=1:EFI \$DISK"
-        echo "sgdisk --new=2:0:+240MiB --typecode=2:8309 --change-name=2:cryptboot \$DISK"
-        echo "sgdisk --new=3:0:+32GiB  --typecode=3:8309 --change-name=3:cryptswap \$DISK"
-        echo "sgdisk --new=4:0:0       --typecode=4:8309 --change-name=4:cryptsystem \$DISK"
+        echo "sgdisk --new=1:0:+260MiB     --typecode=1:ef00 --change-name=1:EFI \$DISK"
+        echo "sgdisk --new=2:0:+260MiB     --typecode=2:8309 --change-name=2:cryptboot \$DISK"
+        echo "sgdisk --new=3:0:+\$SWAPSIZE --typecode=3:8309 --change-name=3:cryptswap \$DISK"
+        echo "sgdisk --new=4:0:0           --typecode=4:8309 --change-name=4:cryptsystem \$DISK"
         echo "sleep 1"
         echo "sync"
         echo
