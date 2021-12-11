@@ -198,7 +198,7 @@ write_script() {
         echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
         echo
         echo "  #su \$USERNAME -c 'paru -S --noconfirm dwm-git'"
-        echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
+        echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme iwgtk"
         echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
         echo "  #su \$USERNAME -c 'paru -S --noconfirm lemonbar-git'"
         echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
@@ -218,7 +218,7 @@ write_script() {
         echo "arch-chroot /mnt sh <<EOF"
         echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
         echo "  pacman -S --noconfirm virtualbox linux-headers"
-        echo "  pacman -S --noconfirm rust cargo-edit cargo-outdated cargo-watch"
+        echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
         echo "  pacman -S --noconfirm docker; usermod -aG docker \$USERNAME; systemctl enable docker.service"
         echo "EOF"
         echo
