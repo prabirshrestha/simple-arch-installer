@@ -216,7 +216,7 @@ write_script() {
         echo
         echo "# dev"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3"
+        echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli1"
         echo "  pacman -S --noconfirm virtualbox linux-headers"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
         echo "  pacman -S --noconfirm docker; usermod -aG docker \$USERNAME; systemctl enable docker.service"
