@@ -115,7 +115,7 @@ write_script() {
         echo
         echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
         echo
-        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr dhcpcd iwd sudo"
+        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr dhcpcd iwd sudo bash-completion"
         echo
         echo "genfstab -U -p /mnt > /mnt/etc/fstab"
         echo
