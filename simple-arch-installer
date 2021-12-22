@@ -172,7 +172,7 @@ write_script() {
         echo "  makepkg -sirc --noconfirm"
         echo "EOF"
         echo
-        echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S wezterm-bin nerd-fonts-fira-code"
+        echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S nerd-fonts-fira-code"
         echo
         echo "arch-chroot /mnt sh <<EOF"
         echo "  pacman -S --noconfirm ufw"
@@ -192,6 +192,7 @@ write_script() {
         echo "  #pacman -S --noconfirm xf86-video-nouveau"
         echo
         echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
+        echo "  pacman -S --noconfirm wezterm"
         echo
         echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo "  # acpid for battery status"
