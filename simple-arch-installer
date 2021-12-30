@@ -217,7 +217,7 @@ write_script() {
         echo
         echo "# dev"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli1"
+        echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree"
         echo "  pacman -S --noconfirm virtualbox linux-headers vagrant"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
         echo "  paru -S --noconfirm cargo-aur-bin"
