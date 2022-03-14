@@ -151,7 +151,7 @@ write_script() {
         echo "zpool set bootfs=zroot/ROOT/default zroot"
         echo "zpool set cachefile=/etc/zfs/zpool.cache zroot"
         echo
-        echo "pacstrap /mnt base base-devel zfs-linux linux-firmware vim"
+        echo "pacstrap /mnt base base-devel zfs-linux linux-firmware"
         echo
         echo "echo \"LANG=en_US.UTF-8\" > /mnt/etc/locale.conf"
         echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
@@ -304,7 +304,7 @@ write_script() {
         echo "  pacman -S --noconfirm fuse"
         echo
         echo "  ### DEV##"
-        echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide"
+        echo "  pacman -S --noconfirm age lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide"
         echo "  pacman -S --noconfirm virtualbox linux-headers vagrant remmina freerdp"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
         echo "  su \$USERNAME -c 'paru -S --noconfirm cargo-aur-bin'"
