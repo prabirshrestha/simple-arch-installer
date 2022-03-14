@@ -9,22 +9,38 @@
 set -eo pipefail
 trap quit:no_message INT
 
-INSTALL_SCRIPT=install_arch.sh
+INSTALL_SCRIPT=install_os.sh
 EDITOR=vim
 
-timedatectl set-ntp true
+#pacman-key --init
+#pacman-key --populate archlinux
+#pacman-key --refresh
 
-sleep 3
-echo
+select_disk() {
+   select ENTRY in $(ls /dev/disk/by-id/ | grep -v '\-part*');
+       do
+           DISK="/dev/disk/by-id/$ENTRY"
+           break
+       done
+}
 
-lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac
-read -p "Enter disk name (ex: /dev/sda): " DISK
+if [ -z "$DISK" ]; then
+    select_disk
+fi
+
 grep MemTotal /proc/meminfo
 read -p "Enter swap size (ex: 0 or 1024MiB or 8GiB): " SWAPSIZE
 read -p "Full disk wipe (y/n): " FULLDISKWIPE
 read -p "Enter hostname: " HOSTNAME
 read -p "Enter username: " USERNAME
 read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles): " DOTFILESREPO
+[ -d /sys/firmware/efi ] && IS_EFI=true || IS_EFI=false
+if cat /proc/cpuinfo | grep "model name" | grep -q "Intel"; then
+    ISINTEL=true
+fi
+if cat /proc/cpuinfo | grep "model name" | grep -q "Amd"; then
+    ISAMD=true
+fi
 
 write_script() {
 	(
@@ -35,14 +51,18 @@ write_script() {
         echo "set -euo pipefail"
         echo
         echo "export DISK=$DISK"
+        echo "export BOOTDISK=\"\${DISK}-part1\""
+        echo "export ROOTDISK=\"\${DISK}-part2\""
         echo "export SWAPSIZE=$SWAPSIZE"
         echo "export FULLDISKWIPE=$FULLDISKWIPE"
+        echo "export IS_EFI=$IS_EFI"
         echo "export USERNAME=$USERNAME"
         echo "export HOSTNAME=$HOSTNAME"
         echo "export DOTFILESREPO=$DOTFILESREPO"
-        echo "export o=defaults,x-mount.mkdir"
-        echo "export o_btrfs=\$o,compress=zstd,ssd,noatime"
-        echo "export HOSTNAME=\$HOSTNAME"
+        echo "export ISINTEL=$ISINTEL"
+        echo "export ISAMD=$ISAMD"
+        echo "export REFINDTIMEOUT=3"
+        echo
         echo "password1=x"
         echo "password2=y"
         echo "until [[ \$password1 == \$password2 ]]; do"
@@ -62,170 +82,237 @@ write_script() {
         echo "  USERPASSWORD=\$password1"
         echo "done"
         echo
-        echo "umount -fR /mnt || true"
-        echo "cryptsetup close boot || true"
-        echo "cryptsetup close system || true"
-        echo "swapoff /dev/mapper/swap || true"
-        echo "cryptsetup close swap || true"
+        echo "timedatectl set-ntp true"
+        echo "curl -s https://eoli3n.github.io/archzfs/init | bash"
         echo
-        echo "sgdisk --zap-all \$DISK"
-        echo "sgdisk --new=1:0:+260MiB     --typecode=1:ef00 --change-name=1:EFI \$DISK"
-        echo "sgdisk --new=2:0:+260MiB     --typecode=2:8309 --change-name=2:cryptboot \$DISK"
-        echo "sgdisk --new=3:0:+\$SWAPSIZE --typecode=3:8309 --change-name=3:cryptswap \$DISK"
-        echo "sgdisk --new=4:0:0           --typecode=4:8309 --change-name=4:cryptsystem \$DISK"
+        echo "[ \"\${FULLDISKWIPE}\" = \"y\" ] && pv --timer --rate --stop-at-size -s \"\$(blockdev --getsize64 \$DISK)\" /dev/zero > $DISK"
+        echo "sgdisk --zap-all \$DISK # zap anything existing"
+        echo "sgdisk -o \$DISK # write a new GPT partition with protective MBR"
+        echo
+        echo "# Partition 1: 512M. EFI System Partition and Legacy BIOS boot with Legacy BOOT ON"
+        echo "sgdisk -n 1:1M:+512M \$DISK   # create partition 1 - first 512M"
+        echo "sgdisk -t 1:EF00 \$DISK       # Set partition type to ESP"
+        echo "sgdisk -A 1:set:2 \$DISK      # Turn legacy boot attribute on"
+        echo "sgdisk -c:1:BOOT \$DISK       # Set partition name to BOOT"
+        echo
+        echo "# Partition 2: 0:0. ZFS Linux System Partition"
+        echo "sgdisk -n 2:0:0 \$DISK        # Partition 2 - everything but the first 512M"
+        echo "sgdisk -t 2:BE00 \$DISK       # Set partition type to Linux"
+        echo "sgdisk -c:2:ZROOT \$DISK      # Set partition name to ZROOT"
+        echo
+        echo "[ ! -f /etc/hostid ] && zgenhostid # generate /etc/hostid"
         echo "sleep 1"
-        echo "sync"
         echo
-        echo "echo cryptsetup..."
-        echo "echo -n \$DISKPASSWORD | cryptsetup -q luksFormat --type luks1 --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptboot -d -"
-        echo "echo -n \$DISKPASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptsystem -d -"
-        echo "echo -n \$DISKPASSWORD | cryptsetup -q luksFormat --align-payload=8192 -s 512 -h sha512 -c aes-xts-plain64 /dev/disk/by-partlabel/cryptswap -d -"
+        echo "# create zfs pool"
+        echo "if [[ \"\$DISKPASSWORD\" == \"\" ]]; then"
+        echo "  ZFSENCRYPTIONOPTIONS="
+        echo "else"
+        echo "  ZFSENCRYPTIONOPTIONS=\"-O encryption=aes-256-gcm -O keylocation=prompt -O keyformat=passphrase\""
+        echo "fi"
+        echo "echo -n \"\$DISKPASSWORD\" | zpool create -f -o ashift=12 \\"
+        echo "  -O acltype=posixacl       \\"
+        echo "  -O relatime=on            \\"
+        echo "  -O xattr=sa               \\"
+        echo "  -O dnodesize=legacy       \\"
+        echo "  -O normalization=formD    \\"
+        echo "  -O mountpoint=none        \\"
+        echo "  -O canmount=off           \\"
+        echo "  -O devices=off            \\"
+        echo "  \$ZFSENCRYPTIONOPTIONS    \\"
+        echo "  -R /mnt                   \\"
+        echo "  zroot \$ROOTDISK"
         echo
-        echo "echo cryptopen..."
-        echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptboot boot -d -"
-        echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptswap swap -d -"
-        echo "echo -n \$DISKPASSWORD | cryptsetup open /dev/disk/by-partlabel/cryptsystem system -d -"
+        echo "zfs create -o mountpoint=none                                 zroot/data"
+        echo "zfs create -o mountpoint=none                                 zroot/ROOT"
+        echo "zfs create -o mountpoint=/ -o canmount=noauto                 zroot/ROOT/default"
+        echo "zfs create -o mountpoint=/home                                zroot/data/home"
+        echo "zfs create -o mountpoint=/root                                zroot/data/home/root"
+        echo "chmod 700 /mnt/root"
+        echo "zfs create -o mountpoint=/home/\$USERNAME                     zroot/data/home/\$USERNAME"
+        echo "zfs create -o mountpoint=/opt                                 zroot/data/opt"
+        echo "zfs create -o mountpoint=/var -o canmount=off                 zroot/data/var"
+        echo "zfs create                                                    zroot/data/var/log"
+        echo "zfs create                                                    zroot/data/var/spool"
+        echo "zfs create -o mountpoint=/var/lib -o canmount=off             zroot/data/var/lib"
+        echo "zfs create                                                    zroot/data/var/lib/libvirt"
+        echo "zfs create -o com.sun:auto-snapshot=false                     zroot/data/var/lib/docker"
+        echo "zfs create -o com.sun:auto-snapshot=false                     zroot/data/var/cache"
+        echo "zfs create -o com.sun:auto-snapshot=false                     zroot/data/var/tmp"
+        echo "chmod 1777 /mnt/var/tmp"
+        echo "zfs create -o mountpoint=/tmp -o com.sun:auto-snapshot=false  zroot/tmp"
+        echo "chmod 1777 /mnt/tmp"
         echo
-        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptboot status=progress bs=4M &> /dev/null; fi;"
-        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptswap status=progress bs=4M &> /dev/null; fi;"
-        echo "if [ \$FULLDISKWIPE == \"y\" ]; then dd if=/dev/zero of=/dev/mapper/cryptsystem status=progress bs=4M &> /dev/null; fi;"
+        echo "zpool export zroot"
+        echo "zpool import -d /dev/disk/by-id -R /mnt zroot -N"
+        echo "[[ \"\$DISKPASSWORD\" != \"\" ]] && echo -n \"\$DISKPASSWORD\" | zfs load-key zroot"
+        echo "zfs mount zroot/ROOT/default"
+        echo "zfs mount -a"
+        echo "mount | grep mnt # verify that everything is mounted correctly"
+        echo "zpool set bootfs=zroot/ROOT/default zroot"
+        echo "zpool set cachefile=/etc/zfs/zpool.cache zroot"
         echo
-        echo "mkfs.fat -F32 -n EFI /dev/disk/by-partlabel/EFI"
-        echo "mkfs.ext4 -L boot /dev/mapper/boot"
-        echo "mkfs.btrfs --label system /dev/mapper/system"
-        echo "mkswap -L swap /dev/mapper/swap"
-        echo "swapon -L swap"
+        echo "pacstrap /mnt base base-devel zfs-linux linux-firmware vim"
         echo
-        echo "mount -t btrfs LABEL=system /mnt"
-        echo "btrfs subvolume create /mnt/@"
-        echo "btrfs subvolume create /mnt/@home"
-        echo "btrfs subvolume create /mnt/@log"
-        echo "btrfs subvolume create /mnt/@root"
-        echo "btrfs subvolume create /mnt/@snapshots"
-        echo "btrfs subvolume create /mnt/@tmp"
-        echo "umount -R /mnt"
-        echo
-        echo "mount -t btrfs -o subvol=@,\$o_btrfs LABEL=system /mnt"
-        echo "mount -t btrfs -o subvol=@home,\$o_btrfs LABEL=system /mnt/home"
-        echo "mount -t btrfs -o subvol=@log,\$o_btrfs LABEL=system /mnt/var/log"
-        echo "mount -t btrfs -o subvol=@root,\$o_btrfs LABEL=system /mnt/root"
-        echo "mount -t btrfs -o subvol=@tmp,\$o_btrfs LABEL=system /mnt/var/tmp"
-        echo "mount -t vfat -o \$o LABEL=EFI /mnt/efi"
-        echo "mount -t ext4 -o \$o LABEL=boot /mnt/boot"
-        echo
-        echo "echo \"Server = http://mirrors.ocf.berkeley.edu/archlinux/\\\$repo/os/\\\$arch\" >> /etc/pacman.d/mirrorlist"
-        echo
-        echo "pacstrap /mnt base base-devel btrfs-progs linux linux-firmware grub efibootmgr dhcpcd iwd sudo bash-completion"
-        echo
-        echo "genfstab -U -p /mnt > /mnt/etc/fstab"
-        echo
-        echo "ln -sf /mnt/usr/share/zoneinfo/America/Los_Angeles /mnt/etc/localtime"
-        echo
-        echo "echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf"
+        echo "echo \"LANG=en_US.UTF-8\" > /mnt/etc/locale.conf"
         echo "sed -i 's/#en_US.UTF/en_US.UTF/' /mnt/etc/locale.gen"
+        echo "arch-chroot /mnt hwclock --systohc"
+        echo "arch-chroot /mnt timedatectl set-ntp true"
+        echo "arch-chroot /mnt timedatectl set-timezone America/Los_Angeles"
         echo "arch-chroot /mnt locale-gen"
-        echo
         echo "echo \$HOSTNAME > /mnt/etc/hostname"
-        echo "arch-chroot /mnt systemctl enable dhcpcd iwd"
         echo
+        echo "cp /etc/hostid /mnt/etc/hostid"
+        echo "mkdir -p /mnt/etc/zfs"
+        echo "zpool set cachefile=/etc/zfs/zpool.cache zroot"
+        echo "cp /etc/zfs/zpool.cache /mnt/etc/zfs/zpool.cache"
+        echo "arch-chroot /mnt systemctl enable zfs.target"
+        echo "arch-chroot /mnt systemctl enable zfs-import-cache"
+        echo "arch-chroot /mnt systemctl enable zfs-mount"
+        echo "arch-chroot /mnt systemctl enable zfs-import.target"
+        echo
+        echo "arch-chroot /mnt pacman -Sy --noconfirm archlinux-keyring"
+        echo "if [ "\$ISINTEL" != \"true\" ]; then arch-chroot /mnt pacman -S --noconfirm intel-ucode; fi;"
+        echo "if [ "\$ISAMD" != \"true\" ]; then arch-chroot /mnt pacman -S --noconfirm amd-ucode; fi;"
+        echo
+        echo "# enable sudoers and create user"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "  mkdir -p /etc/luks"
-        echo "  dd bs=512 count=8 if=/dev/random of=/etc/luks/boot.keyfile iflag=fullblock"
-        echo "  chmod 600 /etc/luks/boot.keyfile"
-        echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptsystem /etc/luks/boot.keyfile"
-        echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptswap /etc/luks/boot.keyfile"
-        echo "  echo -n \$DISKPASSWORD | cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptboot /etc/luks/boot.keyfile"
-        echo "EOF"
-        echo "echo \"boot  UUID=\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptboot) /etc/luks/boot.keyfile\" > /mnt/etc/crypttab"
-        echo "echo \"swap  UUID=\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptswap) /etc/luks/boot.keyfile\" >> /mnt/etc/crypttab"
-        echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
-        echo "echo \"BINARIES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
-        echo "echo \"FILES=\\\"/etc/luks/boot.keyfile\\\"\" >> /mnt/etc/mkinitcpio.conf"
-        echo "echo \"HOOKS=\\\"base systemd modconf keyboard block filesystems btrfs sd-encrypt fsck\\\"\" >> /mnt/etc/mkinitcpio.conf"
-        echo "arch-chroot /mnt mkinitcpio -p linux"
-        echo
-        echo "sed -i 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/' /mnt/etc/default/grub"
-        echo "sed -ie 's/GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"rd.luks.name='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=cryptsystem rd.luks.key='\"\$(lsblk -dno UUID /dev/disk/by-partlabel/cryptsystem)\"'=\\/etc\\/luks\\/boot.keyfile\"/' /mnt/etc/default/grub"
-        echo
-        echo "arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/efi --recheck"
-        echo "arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg"
-        echo
-        echo "# setup sudo"
-        echo "arch-chroot /mnt sh <<EOF"
-        echo "	echo '%wheel ALL=(ALL) ALL' | sudo EDITOR='tee -a' visudo"
-        echo "EOF"
-        echo
-        echo "# create user"
-        echo "arch-chroot /mnt sh <<EOF"
+        echo "  echo '%wheel ALL=(ALL) ALL' | sudo EDITOR='tee -a' visudo"
         echo "  useradd -Nm -g users -G wheel,sys \"\$USERNAME\""
+        echo "  chown -R \$USERNAME /home/\$USERNAME"
         echo "  passwd -d \"\$USERNAME\""
         echo "EOF"
         echo
         echo "# install paru-bin"
         echo "arch-chroot /mnt bash <<EOF"
+        echo "  pacman -S --noconfirm git"
         echo "  cd /tmp"
         echo "  curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz"
         echo "  tar -xvf paru-bin.tar.gz"
         echo "  chmod 777 paru-bin"
         echo "  cd paru-bin"
-        echo "  su \$USERNAME"
-        echo "  makepkg -sirc --noconfirm"
+        echo "  su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm\""
         echo "EOF"
         echo
-        echo "arch-chroot /mnt sudo -u \$USERNAME paru --noconfirm -S nerd-fonts-fira-code"
+        echo "mkfs.vfat -F32 -n BOOT \$BOOTDISK"
+        echo "if [[ \"\$IS_EFI\" == \"true\" ]]; then"
+        echo "  cat << EOF >> /mnt/etc/fstab"
+        echo "UUID=\"\$(blkid -s UUID -o value \$BOOTDISK)\" /boot/efi vfat defaults 0 0"
+        echo "EOF"
+        echo "  arch-chroot /mnt mkdir /boot/efi"
+        echo "  arch-chroot /mnt mount /boot/efi"
+        echo "  arch-chroot /mnt pacman -S --noconfirm refind"
+        echo "  arch-chroot /mnt refind-install"
+        echo "  sed -i 's,timeout 20,timeout \$REFINDTIMEOUT,' /mnt/boot/efi/EFI/refind/refind.conf"
+        echo "  arch-chroot /mnt mkdir -p /boot/efi/EFI/arch"
+        echo "  cat <<- EOF > /mnt/boot/efi/EFI/arch/refind_linux.conf"
+        echo "\"Boot default\"  \"zbm.prefer=zroot zbm.import_policy=hostid zbm.set_hostid rw quiet loglevel=0 zbm.skip\""
+        echo "\"Boot to menu\"  \"zbm.prefer=zroot zbm.import_policy=hostid zbm.set_hostid rw quiet loglevel=0 zbm.show\""
+        echo "EOF"
+        echo "fi"
+        echo "arch-chroot /mnt zfs set org.zfsbootmenu:commandline='rw quiet' zroot/ROOT"
+        echo
+        echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
+        echo "echo \"BINARIES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"FILES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"HOOKS=\\\"base udev autodetect modconf keyboard keymap filesystems zfs\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"COMPRESSION=\\\"zstd\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo
+        echo "arch-chroot /mnt mkinitcpio -P"
+        echo "# Install the ZFSBootMenu package"
+        echo "arch-chroot /mnt bash <<EOF"
+        echo " pacman -S --noconfirm cpanminus kexec-tools fzf util-linux"
+        echo " rm -rf /tmp/zfsbootmenu && mkdir -p /tmp/zfsbootmenu"
+        echo " cd /tmp/zfsbootmenu && curl -L https://github.com/zbm-dev/zfsbootmenu/tarball/master | tar xz --strip=1 && make install && cpanm --notest --installdeps ."
+        echo "EOF"
+        echo "if [[ \"\$IS_EFI\" == \"true\" ]]; then"
+        echo "cat <<-EOF > /mnt/etc/zfsbootmenu/config.yaml"
+        echo "Global:"
+        echo "  ManageImages: true"
+        echo "  BootMountPoint: /boot/efi"
+        echo "  InitCPIO: true"
+        echo "Components:"
+        echo "  Enabled: false"
+        echo "EFI:"
+        echo "  ImageDir: /boot/efi/EFI/arch"
+        echo "  Versions: 2"
+        echo "  Enabled: true"
+        echo "Kernel:"
+        echo "  CommandLine: zbm.prefer=zroot zbm.import_policy=hostid zbm.set_hostid rw quiet loglevel=0"
+        echo "EOF"
+        echo "fi"
+        echo "arch-chroot /mnt generate-zbm --debug"
         echo
         echo "arch-chroot /mnt sh <<EOF"
         echo "  pacman -S --noconfirm ufw"
         echo "  ufw default allow outgoing"
         echo "  ufw default deny incoming"
-        echo "  ufw limit ssh"
-        echo "  #ufw allow http"
-        echo "  #ufw allow https"
-        echo "  #ufw enable"
         echo "  ufw status verbose"
         echo "  systemctl enable ufw"
         echo "EOF"
         echo
-        echo "# install gui"
-        echo "arch-chroot /mnt bash <<EOF"
-        echo "  pacman -S --noconfirm xf86-video-intel"
-        echo "  #pacman -S --noconfirm xf86-video-nouveau"
+        echo "# enable network"
+        echo "cat > /mnt/etc/systemd/network/20-wired.network <<\"EOF\""
+        echo "[Match]"
+        echo "Name=en*"
+        echo "Name=eth*"
+        echo "[Network]"
+        echo "DHCP=yes"
+        echo "EOF"
+        echo "arch-chroot /mnt systemctl disable systemd-networkd-wait-online"
+        echo "arch-chroot /mnt systemctl enable systemd-resolved"
+        echo "arch-chroot /mnt systemctl enable systemd-networkd"
         echo
-        echo "  pacman -S --noconfirm xorg-server xorg-xinit xterm xorg-xbacklight alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
+        echo "arch-chroot /mnt pacman -S --noconfirm iwd"
+        echo "mkdir /mnt/etc/iwd"
+        echo "cat > /mnt/etc/iwd/main.conf <<\"EOF\""
+        echo "[General]"
+        echo "UseDefaultInterface=true"
+        echo "EnableNetworkConfiguration=true"
+        echo "EOF"
+        echo "arch-chroot /mnt systemctl enable iwd"
+        echo
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  pacman -S xorg-server xorg-xinit xorg-server-utils mesa xterm xorg-xbacklight"
+        echo "  if [ "\$ISINTEL" != \"true\" ]; then pacman -S --noconfirm xf86-video-intel libva-intel-driver; fi;"
+        echo "  pacman -S --noconfirm xf86-input-synaptics"
+        echo
+        echo "  pacman -S --noconfirm alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
         echo "  pacman -S --noconfirm wezterm"
         echo
         echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo "  # acpid for battery status"
         echo "  pacman -S --noconfirm acpi acpid; systemctl enable acpid"
         echo
+        echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme && su \$USERNAME -c 'paru -S --noconfirm iwgtk'"
         echo "  #su \$USERNAME -c 'paru -S --noconfirm dwm-git'"
-        echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme && paru -S iwgtk"
         echo "  #pacman -S --noconfirm bspwm sxhkd wmctrl xorg-xprop xorg-xsetroot"
         echo "  #su \$USERNAME -c 'paru -S --noconfirm lemonbar-git'"
         echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
         echo "  #pacman -S --noconfirm xfce4"
         echo "  #pacman -S --noconfirm plasma konsole"
         echo
-        echo "  pacman -S --noconfirm firefox"
+        echo "  #pacman -S --noconfirm firefox"
+        echo "  su \$USERNAME -c 'paru -S --noconfirm google-chrome'"
         echo
         echo "  #xbacklight -set 100"
-        echo "EOF"
         echo
-        echo "arch-chroot /mnt sh <<EOF"
+        echo "  # Virtual box guest"
+        echo "  pacman -S --noconfirm virtualbox-guest-utils"
+        echo "  echo -e 'vboxguest\nvboxsf\nvboxvideo' > /etc/modules-load.d/virtualbox.conf"
+        echo "  systemctl enable vboxservice.service"
+        echo
         echo "  pacman -S --noconfirm fuse"
-        echo "EOF"
         echo
-        echo "# dev"
-        echo "arch-chroot /mnt sh <<EOF"
+        echo "  ### DEV##"
         echo "  pacman -S --noconfirm lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide"
         echo "  pacman -S --noconfirm virtualbox linux-headers vagrant remmina freerdp"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
-        echo "  paru -S --noconfirm cargo-aur-bin"
+        echo "  su \$USERNAME -c 'paru -S --noconfirm cargo-aur-bin'"
         echo "  pacman -S --noconfirm docker; usermod -aG docker \$USERNAME; systemctl enable docker.service"
         echo "EOF"
         echo
         echo "arch-chroot /mnt bash <<EOF"
-        echo "  pacman -Syu --noconfirm --needed git"
+        echo "  pacman -S --noconfirm git"
         echo "  cd /home/\$USERNAME"
         echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz"
         echo "  tar -xvf ./dot.tar.gz"
@@ -234,13 +321,52 @@ write_script() {
         echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; cd .dotfiles; git submodule update --init --recursive; fi;"
         echo "EOF"
         echo
+        echo "arch-chroot /mnt su \$USERNAME -c 'paru -S --noconfirm zrepl-bin'"
+        echo "mkdir -p /mnt/etc/zrepl"
+        echo "cat > /mnt/etc/zrepl/zrepl.yml <<\"EOF\""
+        echo "jobs:"
+        echo "- name: snapjob"
+        echo "  type: snap"
+        echo "  filesystems: {"
+        echo "    \"zroot<\": true,"
+        echo "    \"zroot/data/var/tmp\": false,"
+        echo "    \"zroot/data/var/cache\": false,"
+        echo "    \"zroot/tmp\": false,"
+        echo "  }"
+        echo "  snapshotting:"
+        echo "    type: periodic"
+        echo "    interval: 15m"
+        echo "    prefix: zrepl_"
+        echo "  pruning:"
+        echo "    keep:"
+        echo "    # fade-out scheme for snapshots starting with zrepl_"
+        echo "      - type: grid"
+        echo "        grid: 1x1h(keep=all) | 24x1h | 30x1d | 6x30d"
+        echo "        regex: \"^zrepl_.*\""
+        echo "      # keep all snapshots that don't have the zrepl_ prefix"
+        echo "      - type: regex"
+        echo "        negate: true"
+        echo "        regex: \"^zrepl_.*\""
+        echo "EOF"
+        echo "arch-chroot /mnt systemctl enable zrepl"
+        echo
+        echo "arch-chroot /mnt su \$USERNAME -c 'paru -Syu --noconfirm'"
+        echo
         echo "# create user password"
         echo "arch-chroot /mnt sh <<EOF"
-        echo "  echo -e "\$USERPASSWORD"\"\\n\"\$USERPASSWORD | passwd \"\$USERNAME\""
+        echo "  echo \"\$USERNAME:\$USERPASSWORD\" | chpasswd"
         echo "EOF"
         echo
         echo "# disallow root login"
         echo "arch-chroot /mnt passwd -l root"
+        echo
+        echo "arch-chroot /mnt zfs snapshot -r zroot@install"
+        echo
+        echo "zfs umount -a"
+        echo "umount -R /mnt"
+        echo "zpool export zroot"
+        echo
+        echo "echo \"OS setup complete. Please 'reboot' your machine.\""
     ) > "$INSTALL_SCRIPT"
     chmod +x "$INSTALL_SCRIPT"
 }
