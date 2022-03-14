@@ -272,7 +272,7 @@ write_script() {
         echo "arch-chroot /mnt systemctl enable iwd"
         echo
         echo "arch-chroot /mnt bash <<EOF"
-        echo "  pacman -S xorg-server xorg-xinit xorg-server-utils mesa xterm xorg-xbacklight"
+        echo "  pacman -S xorg-server xorg-xinit mesa xterm xorg-xbacklight"
         echo "  if [ "\$ISINTEL" != \"true\" ]; then pacman -S --noconfirm xf86-video-intel libva-intel-driver; fi;"
         echo "  pacman -S --noconfirm xf86-input-synaptics"
         echo
