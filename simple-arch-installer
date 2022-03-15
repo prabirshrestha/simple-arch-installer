@@ -375,6 +375,7 @@ write_script() {
         echo "  fi"
         echo "fi"
         echo "EOF"
+	echo "chmod +x /mnt/bin/zfs-recursive-rollback"
         echo
         echo "arch-chroot /mnt su \$USERNAME -c 'paru -Syu --noconfirm'"
         echo
