@@ -360,7 +360,7 @@ write_script() {
         echo "then"
         echo "  usage;"
         echo "else"
-        echo "  regex=\"^([a-zA-Z0-9/\.\_\-]*)\@(.*)\""
+        echo "  regex=\"^([a-zA-Z0-9/\\.\\_\\-]*)\\@(.*)\""
         echo "  if [[ ! \\\$1 =~ \\\$regex ]]; then"
         echo "    usage;"
         echo "  else"
