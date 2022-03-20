@@ -170,7 +170,6 @@ write_script() {
         echo
         echo "cp /etc/hostid /mnt/etc/hostid"
         echo "mkdir -p /mnt/etc/zfs"
-        echo "zpool set cachefile=/etc/zfs/zpool.cache zroot"
         echo "cp /etc/zfs/zpool.cache /mnt/etc/zfs/zpool.cache"
         echo "arch-chroot /mnt systemctl enable zfs.target"
         echo "arch-chroot /mnt systemctl enable zfs-import-cache"
