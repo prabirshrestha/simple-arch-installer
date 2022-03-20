@@ -214,7 +214,7 @@ write_script() {
         echo "echo \"MODULES=\\\"\\\"\" > /mnt/etc/mkinitcpio.conf"
         echo "echo \"BINARIES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "echo \"FILES=\\\"\\\"\" >> /mnt/etc/mkinitcpio.conf"
-        echo "echo \"HOOKS=\\\"base udev autodetect modconf keyboard keymap filesystems zfs\\\"\" >> /mnt/etc/mkinitcpio.conf"
+        echo "echo \"HOOKS=\\\"base udev autodetect modconf block keyboard keymap zfs filesystems\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "echo \"COMPRESSION=\\\"zstd\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo
         echo "arch-chroot /mnt mkinitcpio -P"
