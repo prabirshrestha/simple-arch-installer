@@ -151,7 +151,7 @@ write_script() {
         echo "zpool set bootfs=zroot/ROOT/default zroot"
         echo "zpool set cachefile=/etc/zfs/zpool.cache zroot"
         echo
-        echo "pacstrap /mnt base base-devel linux linux-headers zfs-dkms"
+        echo "pacstrap /mnt base base-devel zfs-linux linux-headers zfs-utils"
 	echo "tee -a /mnt/etc/pacman.conf <<EOF"
         echo "[archzfs]"
         echo "Server = https://archzfs.com/\\\$repo/\\\$arch"
