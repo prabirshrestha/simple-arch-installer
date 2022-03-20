@@ -161,6 +161,7 @@ write_script() {
         echo "arch-chroot /mnt timedatectl set-timezone America/Los_Angeles"
         echo "arch-chroot /mnt locale-gen"
         echo "echo \$HOSTNAME > /mnt/etc/hostname"
+	echo "echo -e \"127.0.0.1 localhost\n::1 localhost\" >> /mnt/etc/hosts"
         echo
         echo "cp /etc/hostid /mnt/etc/hostid"
         echo "mkdir -p /mnt/etc/zfs"
