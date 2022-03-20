@@ -244,7 +244,7 @@ write_script() {
         echo "  Versions: 2"
         echo "  Enabled: true"
         echo "Kernel:"
-        echo "  CommandLine: zbm.prefer=zroot zbm.import_policy=hostid zbm.set_hostid rw quiet loglevel=0"
+        echo "  CommandLine: zbm.prefer=zroot zbm.import_policy=hostid zbm.set_hostid ro quiet loglevel=0"
         echo "EOF"
         echo "fi"
         echo "arch-chroot /mnt generate-zbm --debug"
