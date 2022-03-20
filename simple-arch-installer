@@ -265,7 +265,6 @@ write_script() {
         echo "[Network]"
         echo "DHCP=yes"
         echo "EOF"
-        echo "arch-chroot /mnt systemctl disable systemd-networkd-wait-online"
         echo "arch-chroot /mnt systemctl enable systemd-resolved"
         echo "arch-chroot /mnt systemctl enable systemd-networkd"
         echo
