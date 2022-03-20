@@ -154,7 +154,7 @@ write_script() {
         echo "pacstrap /mnt base base-devel linux linux-headers zfs-dkms"
 	echo "tee -a /mnt/etc/pacman.conf <<EOF"
         echo "[archzfs]"
-        echo "Include = /etc/pacman.d/mirrorlist-archzfs"
+        echo "Server = https://archzfs.com/$repo/$arch"
         echo "EOF"
 	echo "arch-chroot /mnt pacman-key -r DDF7DB817396A49B2A2723F7403BD972F75D9D76"
 	echo "arch-chroot /mnt pacman-key --lsign-key DDF7DB817396A49B2A2723F7403BD972F75D9D76"
