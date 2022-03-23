@@ -172,8 +172,8 @@ write_script() {
         echo "arch-chroot /mnt systemctl enable zfs-import.target"
         echo
         echo "arch-chroot /mnt pacman -Sy --noconfirm archlinux-keyring"
-        echo "if [ "\$ISINTEL" != \"true\" ]; then arch-chroot /mnt pacman -S --noconfirm intel-ucode; fi;"
-        echo "if [ "\$ISAMD" != \"true\" ]; then arch-chroot /mnt pacman -S --noconfirm amd-ucode; fi;"
+        echo "if [ "\$ISINTEL" == \"true\" ]; then arch-chroot /mnt pacman -S --noconfirm intel-ucode; fi;"
+        echo "if [ "\$ISAMD" == \"true\" ]; then arch-chroot /mnt pacman -S --noconfirm amd-ucode; fi;"
         echo
         echo "# enable sudoers and create user"
         echo "arch-chroot /mnt sh <<EOF"
@@ -274,7 +274,7 @@ write_script() {
         echo
         echo "arch-chroot /mnt bash <<EOF"
         echo "  pacman -S --noconfirm xorg-server xorg-xinit mesa xterm xorg-xbacklight xsel"
-        echo "  if [ "\$ISINTEL" != \"true\" ]; then pacman -S --noconfirm xf86-video-intel libva-intel-driver; fi;"
+        echo "  if [ "\$ISINTEL" == \"true\" ]; then pacman -S --noconfirm xf86-video-intel libva-intel-driver; fi;"
         echo "  pacman -S --noconfirm xf86-input-synaptics"
         echo
         echo "  pacman -S --noconfirm alsa-utils ttf-fira-code ttf-freefont ttf-arphic-uming ttf-baekmuk pulseaudio"
