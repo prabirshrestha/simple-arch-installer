@@ -180,7 +180,7 @@ write_script() {
         echo "# enable sudoers and create user"
         echo "arch-chroot /mnt sh <<EOF"
         echo "  echo '%wheel ALL=(ALL) ALL' | sudo EDITOR='tee -a' visudo"
-        echo "  useradd -Nm -g users -G sys,log,network,floppy,scanner,power,rfkill,users,video,storage,optical,Ip,audio,wheel,adm \"\$USERNAME\""
+        echo "  useradd -Nm -g users -G sys,log,network,floppy,scanner,power,rfkill,users,video,storage,optical,audio,wheel,adm \"\$USERNAME\""
         echo "  chown -R \$USERNAME /home/\$USERNAME"
         echo "  passwd -d \"\$USERNAME\""
         echo "EOF"
