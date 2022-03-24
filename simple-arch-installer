@@ -85,7 +85,7 @@ write_script() {
         echo "timedatectl set-ntp true"
         echo "curl -s https://eoli3n.github.io/archzfs/init | bash"
         echo
-        echo "[ \"\${FULLDISKWIPE}\" = \"y\" ] && pv --timer --rate --stop-at-size -s \"\$(blockdev --getsize64 \$DISK)\" /dev/zero > $DISK"
+        echo "[ \"\${FULLDISKWIPE}\" = \"y\" ] && pv --timer --rate --stop-at-size -s \"\$(blockdev --getsize64 \$DISK)\" /dev/zero > \$DISK"
         echo "sgdisk --zap-all \$DISK # zap anything existing"
         echo "sgdisk -o \$DISK # write a new GPT partition with protective MBR"
         echo
