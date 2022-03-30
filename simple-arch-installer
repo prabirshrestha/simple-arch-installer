@@ -220,8 +220,6 @@ write_script() {
         echo "echo \"HOOKS=\\\"base udev autodetect modconf block keyboard zfs filesystems\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo "echo \"COMPRESSION=\\\"zstd\\\"\" >> /mnt/etc/mkinitcpio.conf"
         echo
-        echo "su \$USERNAME -c 'paru -S --noconfirm mkinitcpio-firmware'"
-        echo
         echo "arch-chroot /mnt mkinitcpio -P"
         echo "# Install the ZFSBootMenu package"
         echo "arch-chroot /mnt bash <<EOF"
