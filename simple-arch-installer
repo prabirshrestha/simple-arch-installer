@@ -164,6 +164,7 @@ write_script() {
         echo
 	echo "  sed -i 's/^MODULES=.*/MODULES=(i915 intel_agp)/' /etc/mkinitcpio.conf"
         echo "  sed -i \"s|^HOOKS=.*|HOOKS=(base udev autodetect modconf keyboard block zfs filesystems)|g\" /etc/mkinitcpio.conf"
+	echo "  sed -i 's/^COMPRESSION=.*/COMPRESSION=(zstd)/' /etc/mkinitcpio.conf"
         echo "  mkinitcpio -p linux"
         echo
         echo "  pacman -S --noconfirm sudo"
