@@ -129,8 +129,8 @@ write_script() {
         echo
         echo "  pacman-key --recv-keys F75D9D76"
         echo "  pacman-key --lsign-key F75D9D76"
-        echo "  cat '[archzfs]' >> /etc/pacman.conf"
-        echo "  cat 'Server = https://archzfs.com/\\\$repo/\\\$arch' >> /etc/pacman.conf"
+        echo "  echo '[archzfs]' >> /etc/pacman.conf"
+        echo "  echo 'Server = https://archzfs.com/\\\$repo/\\\$arch' >> /etc/pacman.conf"
         echo
         echo "  pacman -Syu --noconfirm"
         echo "  pacman -S --noconfirm archzfs-linux"
