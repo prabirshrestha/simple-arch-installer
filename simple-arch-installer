@@ -146,7 +146,7 @@ write_script() {
         echo
         echo "  ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime"
         echo "  hwclock --systohc"
-	echo "  timedatectl set-ntp true"
+        echo "  timedatectl set-ntp true"
         echo "  sed -i 's/#en_US.UTF/en_US.UTF/' /etc/locale.gen"
         echo "  locale-gen"
         echo "  echo \$HOSTNAME > /etc/hostname"
@@ -190,6 +190,16 @@ write_script() {
         echo "  chown -R \$USERNAME /home/\$USERNAME"
         echo "  passwd -d \"\$USERNAME\""
         echo "EOF"
+        echo
+        echo "# install paru-bin"
+        echo "arch-chroot /mnt pacman -S --noconfirm git base-devel && git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin && pushd /tmp/paru-bin && su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm\" && popd && rm -rf /tmp/paru-bin && paru -Sy --noconfirm paru-bin"
+        echo
+        echo "arch-chroot /mnt bash <<EOF"
+        echo "  echo \"\$USERNAME:\$USERPASSWORD\" | chpasswd"
+        echo "  passwd -l root"
+        echo "  zfs snapshot -r zroot@install"
+        echo "EOF"
+        echo
         echo "umount /mnt/boot/efi"
         echo "zpool export zroot"
         echo
