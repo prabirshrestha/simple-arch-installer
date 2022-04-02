@@ -162,7 +162,7 @@ write_script() {
         echo "  chmod 600 /boot/*"
         echo "  chmod 700 /boot/efi"
         echo
-	echo "  sed -i 's/^MODULES=.*/MODULES=(i915)/' /etc/mkinitcpio.conf"
+	echo "  sed -i 's/^MODULES=.*/MODULES=(i915 intel_agp)/' /etc/mkinitcpio.conf"
         echo "  sed -i \"s|^HOOKS=.*|HOOKS=(base udev autodetect modconf keyboard block zfs filesystems)|g\" /etc/mkinitcpio.conf"
         echo "  mkinitcpio -p linux"
         echo
@@ -180,7 +180,8 @@ write_script() {
         echo "  pacman -S --noconfirm networkmanager"
         echo "  systemctl enable NetworkManager"
         echo
-        echo "  pacman -S --noconfirm xorg xfce4 xfce4-goodies base-devel"
+	echo "  pacman -S --noconfirm base-devel gvim"
+        echo "  pacman -S --noconfirm xorg xfce4 xfce4-goodies"
         echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo
         echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm google-chrome\""
