@@ -191,6 +191,7 @@ write_script() {
         echo "EOF"
         echo
         echo "umount /mnt/boot/efi"
+	echo "zfs umount -a"
         echo "zpool export zroot"
         echo
         echo "echo \"OS setup complete. Please 'reboot' your machine.\""
