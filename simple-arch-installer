@@ -178,7 +178,7 @@ write_script() {
         echo "  cd /tmp && curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz && tar -xvf paru-bin.tar.gz && chmod 777 paru-bin && cd paru-bin"
         echo "  su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm && paru -S --noconfirm paru-bin\""
         echo "  cd /tmp && rm -rf /tmp/paru-bin"
-	    echo
+	echo
         echo "  pacman -S --noconfirm networkmanager"
         echo "  systemctl enable NetworkManager"
         echo
