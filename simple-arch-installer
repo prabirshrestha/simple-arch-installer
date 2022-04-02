@@ -200,7 +200,7 @@ write_script() {
         echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm google-chrome\""
 	echo
 	echo "  ### DEV ###"
-        echo "  pacman -S --noconfirm age lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide"
+        echo "  pacman -S --noconfirm age lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide wezterm xterm"
         echo "  pacman -S --noconfirm remmina freerdp"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
         echo
