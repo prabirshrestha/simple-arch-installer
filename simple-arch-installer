@@ -154,8 +154,7 @@ write_script() {
         echo "  zfs set org.zfsbootmenu:commandline=\"rw quiet\" zroot/ROOT/default"
         echo "  zfs set canmount=noauto zroot/ROOT"
         echo "  zfs set canmount=noauto zroot/ROOT/default"
-        echo "  pacman -S --noconfirm intel-ucode"
-        echo "  if [ "\$ISINTEL" == \"true\" ]; then pacman -S --noconfirm intel-ucode; fi;"
+        echo "  if [ "\$ISINTEL" == \"true\" ]; then pacman -S --noconfirm intel-ucode xf86-video-intel libva-intel-driver; fi;"
         echo
         echo "  chmod 700 /boot"
         echo "  chmod 600 /boot/*"
@@ -192,7 +191,6 @@ write_script() {
         echo "  systemctl enable NetworkManager"
 	echo
 	echo "  ### GUI ###"
-	echo "  if [ "\$ISINTEL" == \"true\" ]; then pacman -S --noconfirm xf86-video-intel libva-intel-driver; fi;"
 	echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
 	echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
         echo "  #pacman -S --noconfirm xorg xfce4 xfce4-goodies"
