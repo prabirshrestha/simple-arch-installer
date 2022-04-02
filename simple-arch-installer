@@ -178,14 +178,27 @@ write_script() {
         echo "  su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm && paru -S --noconfirm paru-bin\""
         echo "  cd /tmp && rm -rf /tmp/paru-bin"
 	echo
+        echo "  pacman -S --noconfirm git"
+        echo "  cd /home/\$USERNAME"
+        echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz && tar -xvf ./dot.tar.gz && rm ./dot.tar.gz && mv ./dot /bin/"
+        echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; cd .dotfiles; git submodule update --init --recursive; fi;"
+	echo
         echo "  pacman -S --noconfirm networkmanager"
         echo "  systemctl enable NetworkManager"
-        echo
-	echo "  pacman -S --noconfirm base-devel gvim"
-        echo "  pacman -S --noconfirm xorg xfce4 xfce4-goodies"
-        echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
+	echo
+	echo "  ### GUI ###"
+	echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
+	echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
+        echo "  #pacman -S --noconfirm xorg xfce4 xfce4-goodies"
+	echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
+	echo "  #pacman -S --noconfirm plasma konsole"
         echo
         echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm google-chrome\""
+	echo
+	echo "  ### DEV ###"
+        echo "  pacman -S --noconfirm age lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide"
+        echo "  pacman -S --noconfirm remmina freerdp"
+        echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
         echo
         echo "  echo \"\$USERNAME:\$USERPASSWORD\" | chpasswd"
         echo "  passwd -l root"
