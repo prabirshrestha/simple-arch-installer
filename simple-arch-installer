@@ -177,6 +177,12 @@ write_script() {
         echo "  su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm && paru -S --noconfirm paru-bin\""
         echo "  cd /tmp && rm -rf /tmp/paru-bin"
 	echo
+	echo "  ### FIREWALL ###"
+	echo "  pacman -S --noconfirm ufw"
+	echo "  ufw default allow outgoing"
+	echo "  ufw deny incoming"
+	echo "  systemctl enable ufw"
+	echo
         echo "  pacman -S --noconfirm git"
         echo "  cd /home/\$USERNAME"
         echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz && tar -xvf ./dot.tar.gz && rm ./dot.tar.gz && mv ./dot /bin/"
