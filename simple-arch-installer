@@ -126,16 +126,12 @@ write_script() {
         echo "arch-chroot /mnt sh <<EOF"
         echo "  pacman-key --init"
         echo "  pacman-key --populate archlinux"
+        echo
         echo "  pacman-key --recv-keys F75D9D76"
         echo "  pacman-key --lsign-key F75D9D76"
-        echo "EOF"
+        echo "  cat '[archzfs]' >> /etc/pacman.conf"
+        echo "  cat 'Server = https://archzfs.com/\\\$repo/\\\$arch' >> /etc/pacman.conf"
         echo
-        echo "tee -a /mnt/etc/pacman.conf <<EOF"
-        echo "[archzfs]"
-        echo "Server = https://archzfs.com/\\\$repo/\\\$arch"
-        echo "EOF"
-        echo
-        echo "arch-chroot /mnt sh <<EOF"
         echo "  pacman -Syu --noconfirm"
         echo "  pacman -S --noconfirm archzfs-linux"
         echo "  zpool set cachefile=/etc/zfs/zpool.cache zroot"
@@ -165,28 +161,31 @@ write_script() {
         echo "  pacman -S --noconfirm intel-ucode"
         echo "  if [ "\$ISINTEL" == \"true\" ]; then pacman -S --noconfirm intel-ucode xf86-video-intel libva-intel-driver; fi;"
         echo
-        echo "  sed -i \"s|^HOOKS=.*|HOOKS=(base udev autodetect modconf keyboard block zfs filesystems)|g\" /etc/mkinitcpio.conf"
-        echo "  mkinitcpio -p linux"
-        echo
         echo "  chmod 700 /boot"
         echo "  chmod 600 /boot/*"
         echo "  chmod 700 /boot/efi"
         echo
-        echo "  sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers"
+        echo "  sed -i \"s|^HOOKS=.*|HOOKS=(base udev autodetect modconf keyboard block zfs filesystems)|g\" /etc/mkinitcpio.conf"
+        echo "  mkinitcpio -p linux"
+        echo
+        echo "  pacman -S --noconfirm sudo"
+        echo "  sed -i '/%wheel ALL=(ALL:ALL) ALL/s/^#//' /etc/sudoers"
         echo "  useradd -m -g users -G wheel \$USERNAME"
         echo "  chown -R \$USERNAME /home/\$USERNAME"
         echo "  passwd -d \"\$USERNAME\""
         echo
         echo "  pacman -S --noconfirm git base-devel"
         echo "  cd /tmp && curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz && tar -xvf paru-bin.tar.gz && chmod 777 paru-bin && cd paru-bin"
-        echo "  su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm\""
+        echo "  su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm && paru -S --noconfirm paru-bin\""
+        echo "  cd /tmp && rm -rf /tmp/paru-bin"
 	    echo
-	    echo "  pacman -S --noconfirm networkmanager"
+        echo "  pacman -S --noconfirm networkmanager"
         echo "  systemctl enable NetworkManager"
+        echo
         echo "  pacman -S --noconfirm xorg xfce4 xfce4-goodies base-devel"
-        echo "  #pacman -S --noconfirm sddm; systemctl enable sddm.service"
-	    echo
-	    echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm google-chrome\""
+        echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
+        echo
+        echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm google-chrome\""
         echo
         echo "  echo \"\$USERNAME:\$USERPASSWORD\" | chpasswd"
         echo "  passwd -l root"
