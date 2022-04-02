@@ -165,16 +165,22 @@ write_script() {
 	echo "  sed -i 's/^COMPRESSION=.*/COMPRESSION=(zstd)/' /etc/mkinitcpio.conf"
         echo "  mkinitcpio -p linux"
         echo
+	echo "  ### USER and SUDO configuration ###"
         echo "  pacman -S --noconfirm sudo"
         echo "  sed -i '/%wheel ALL=(ALL:ALL) ALL/s/^#//' /etc/sudoers"
         echo "  useradd -m -g users -G wheel \$USERNAME"
         echo "  chown -R \$USERNAME /home/\$USERNAME"
         echo "  passwd -d \"\$USERNAME\""
         echo
+	echo "  ### AUR support via paru ###"
         echo "  pacman -S --noconfirm git base-devel"
         echo "  cd /tmp && curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz && tar -xvf paru-bin.tar.gz && chmod 777 paru-bin && cd paru-bin"
         echo "  su \"\$USERNAME\" -c \"makepkg -sirc --noconfirm && paru -S --noconfirm paru-bin\""
         echo "  cd /tmp && rm -rf /tmp/paru-bin"
+	echo
+	echo "  ### NETWORK ###"
+        echo "  pacman -S --noconfirm networkmanager"
+        echo "  systemctl enable NetworkManager"
 	echo
 	echo "  ### FIREWALL ###"
 	echo "  pacman -S --noconfirm ufw"
@@ -182,13 +188,11 @@ write_script() {
 	echo "  ufw deny incoming"
 	echo "  systemctl enable ufw"
 	echo
+	echo "  ### DOTFILEs ###"
         echo "  pacman -S --noconfirm git"
         echo "  cd /home/\$USERNAME"
         echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz && tar -xvf ./dot.tar.gz && rm ./dot.tar.gz && mv ./dot /bin/"
         echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; cd .dotfiles; git submodule update --init --recursive; fi;"
-	echo
-        echo "  pacman -S --noconfirm networkmanager"
-        echo "  systemctl enable NetworkManager"
 	echo
 	echo "  ### GUI ###"
 	echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
