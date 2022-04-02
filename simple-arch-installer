@@ -162,6 +162,7 @@ write_script() {
         echo "  chmod 600 /boot/*"
         echo "  chmod 700 /boot/efi"
         echo
+	echo "  sed -i 's/^MODULES=.*/MODULES=(i915)/' /etc/mkinitcpio.conf"
         echo "  sed -i \"s|^HOOKS=.*|HOOKS=(base udev autodetect modconf keyboard block zfs filesystems)|g\" /etc/mkinitcpio.conf"
         echo "  mkinitcpio -p linux"
         echo
