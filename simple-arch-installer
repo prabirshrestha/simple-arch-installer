@@ -216,7 +216,7 @@ write_script() {
         echo
         echo "  ### SOUND ###"
         echo "  pacman -S --noconfirm pipewire pipewire-alsa pipewire-pulse pipewire-media-session pavucontrol"
-        echo "  su \"\$USERNAME\" -c \"systemctl --user enable --now pipewire.service pipewire.socket pipewire-media-session.service pipewire-pulse.service pipewire-pulse.socket\""
+        echo "  su \"\$USERNAME\" -c \"systemctl --user enable pipewire.service pipewire.socket pipewire-media-session.service pipewire-pulse.service pipewire-pulse.socket\""
         echo
         echo "  ### GUI ###"
         echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
