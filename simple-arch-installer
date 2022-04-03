@@ -214,6 +214,10 @@ write_script() {
         echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz && tar -xvf ./dot.tar.gz && rm ./dot.tar.gz && mv ./dot /bin/"
         echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; cd .dotfiles; git submodule update --init --recursive; fi;"
         echo
+        echo "  ### SOUND ###"
+        echo "  pacman -S --noconfirm pipewire pipewire-alsa pipewire-pulse pipewire-media-session"
+        echo "  systemctl --user enable --now pipewire.service pipewire.socket pipewire-media-session.service pipewire-pulse.service pipewire-pulse.socket"
+        echo
         echo "  ### GUI ###"
         echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo "  pacman -S --noconfirm awesome nemo rofi arc-icon-theme"
