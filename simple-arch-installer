@@ -124,6 +124,7 @@ write_script() {
         echo "zfs create -o mountpoint=/var/spool       -o canmount=off                                 zroot/DATA/var/spool"
         echo "zfs create -o mountpoint=/usr             -o canmount=off                                 zroot/DATA/usr"
         echo "zfs create -o mountpoint=/usr/local       -o canmount=off                                 zroot/DATA/usr/local"
+        echo "zpool set bootfs=zroot/ROOT/default zroot"
         echo "zpool export zroot"
         echo "zpool import -R /mnt zroot"
         echo "[[ \"\$DISKPASSWORD\" != \"\" ]] && echo -n \"\$DISKPASSWORD\" | zfs load-key zroot"
