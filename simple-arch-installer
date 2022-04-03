@@ -117,6 +117,8 @@ write_script() {
         echo "zfs create -o mountpoint=/var             -o canmount=off                                 zroot/DATA/var"
         echo "zfs create -o mountpoint=/var/games       -o canmount=off                                 zroot/DATA/var/games"
         echo "zfs create -o mountpoint=/var/lib         -o canmount=off                                 zroot/DATA/var/lib"
+        echo "zfs create -o mountpoint=/var/lib/docker  -o canmount=off                                 zroot/DATA/var/lib/docker"
+        echo "zfs create -o mountpoint=/var/lib/libvirt -o canmount=off                                 zroot/DATA/var/lib/libvirt"
         echo "zfs create -o mountpoint=/var/lib         -o canmount=off                                 zroot/DATA/var/log"
         echo "zfs create -o mountpoint=/var/cache       -o canmount=off -o com.sun:auto-snapshot=false  zroot/DATA/var/cache"
         echo "zfs create -o mountpoint=/var/spool       -o canmount=off                                 zroot/DATA/var/spool"
