@@ -277,3 +277,6 @@ if [ "$RUN_INSTALLER" == "YES" ]; then
 else
     echo "Cancelling installation"
 fi
+
+
+# vim: set sw=2 ts=2 sts=2 et
