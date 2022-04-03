@@ -25,8 +25,8 @@ if [ -z "$DISK" ]; then
 fi
 
 grep MemTotal /proc/meminfo
-read -p "Enter swap size (ex: 0 or 1024MiB or 8GiB): " SWAPSIZE
-# read -p "Full disk wipe (y/n): " FULLDISKWIPE
+# read -p "Enter swap size (ex: 0 or 1024MiB or 8GiB): " SWAPSIZE
+read -p "Full disk wipe (y/n): " FULLDISKWIPE
 read -p "Enter hostname: " HOSTNAME
 read -p "Enter username: " USERNAME
 read -p "Enter dotfiles repository (ex: prabirshrestha/dotfiles): " DOTFILESREPO
