@@ -215,7 +215,7 @@ write_script() {
         echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; cd .dotfiles; git submodule update --init --recursive; fi;"
         echo
         echo "  ### SOUND ###"
-        echo "  pacman -S --noconfirm pipewire pipewire-alsa pipewire-pulse pipewire-media-session"
+        echo "  pacman -S --noconfirm pipewire pipewire-alsa pipewire-pulse pipewire-media-session pavucontrol"
         echo "  systemctl --user enable --now pipewire.service pipewire.socket pipewire-media-session.service pipewire-pulse.service pipewire-pulse.socket"
         echo
         echo "  ### GUI ###"
