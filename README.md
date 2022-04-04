@@ -11,11 +11,6 @@
 bash <(curl -sL https://bit.ly/simple-arch-installer)
 ```
 
-## Post Installation
-
-* To increase backlight run `xbacklight -set 100`.
-* To connect to internet use `nmtui`.
-
 ## License
 
 MIT
