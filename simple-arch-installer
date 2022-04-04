@@ -4,7 +4,7 @@
 #    iwctl station wlan0 connect "networkname"
 # To install big font:
 #    setfont solar24x32
-# To copy archlinux ios to device
+# To copy archlinux iso to device
 #    dd if=archlinux.iso of=/dev/sdb bs=4M
 set -eo pipefail
 trap quit:no_message INT
