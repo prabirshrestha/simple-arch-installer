@@ -158,7 +158,7 @@ write_script() {
         echo
         echo "  ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime"
         echo "  hwclock --systohc"
-        echo "  timedatectl set-ntp true"
+        echo "  systemctl enable systemd-timesyncd"
         echo "  sed -i 's/#en_US.UTF/en_US.UTF/' /etc/locale.gen"
         echo "  locale-gen"
         echo "  echo \$HOSTNAME > /etc/hostname"
