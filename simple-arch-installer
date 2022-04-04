@@ -144,6 +144,7 @@ write_script() {
         echo
         echo "arch-chroot /mnt sh <<EOF"
         echo "  sed -i '/Color/s/^#//g' /etc/pacman.conf"
+        echo "  sed -i '/ParallelDownloads/s/^#//g' /etc/pacman.conf"
         echo "  pacman-key --init"
         echo "  pacman-key --populate archlinux"
         echo
