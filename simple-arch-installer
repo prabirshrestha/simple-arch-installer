@@ -244,7 +244,8 @@ write_script() {
         echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
         echo "  #pacman -S --noconfirm plasma konsole"
         echo
-        echo "  pacman -S --noconfirm chromium"
+        echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm google-chrome\""
+        echo "  #pacman -S --noconfirm chromium"
         echo
         echo "  ### DEV ###"
         echo "  pacman -S --noconfirm age lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide wezterm xterm"
