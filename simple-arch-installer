@@ -155,7 +155,7 @@ write_script() {
         echo
         echo "  pacman -Syu --noconfirm"
         echo "  pacman -S --noconfirm archzfs-linux"
-        echo "  #pacman -S --noconfirm archzfs-dkms"
+        echo "  #pacman -S --noconfirm archzfs-dkms linux-headers"
         echo "  zpool set cachefile=/etc/zfs/zpool.cache zroot"
         echo "  systemctl enable zfs.target zfs-import-cache zfs-mount zfs-import.target"
         echo
