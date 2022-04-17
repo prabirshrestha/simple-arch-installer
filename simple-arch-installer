@@ -230,9 +230,8 @@ write_script() {
         echo
         echo "  ### DOTFILEs ###"
         echo "  pacman -S --noconfirm git"
-        echo "  cd /home/\$USERNAME"
-        echo "  curl -Lk https://github.com/ubnt-intrepid/dot/releases/download/v0.1.4/dot-v0.1.4-x86_64-unknown-linux-musl.tar.gz -o dot.tar.gz && tar -xvf ./dot.tar.gz && rm ./dot.tar.gz && mv ./dot /bin/"
-        echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'dot init \$DOTFILESREPO'; cd .dotfiles; git submodule update --init --recursive; fi;"
+        echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm dotter-rs-bin\""
+        echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'git clone --recurse-submodules https://github.com/\$DOTFILESREPO.git ~/.dotfiles && cd ~/.dotter && dotter -vv && git remote rm origin && git remote add origin git@github.com:\$DOTFILESREPO.git'; fi;"
         echo
         echo "  ### SOUND ###"
         echo "  pacman -S --noconfirm pipewire pipewire-alsa pipewire-pulse pipewire-media-session pavucontrol"
