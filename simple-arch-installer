@@ -117,7 +117,7 @@ write_script() {
         echo "zfs create -o mountpoint=/var             -o canmount=off                                 zroot/var"
         echo "zfs create -o mountpoint=/var/games       -o canmount=on                                  zroot/var/games"
         echo "zfs create -o mountpoint=/var/lib         -o canmount=off                                 zroot/var/lib"
-        echo "zfs create -o mountpoint=/var/lib/docker  -o canmount=on                                  zroot/var/lib/docker"
+        echo "zfs create -o mountpoint=/var/lib/docker  -o canmount=on -o dedup=off                     zroot/var/lib/docker"
         echo "zfs create -o mountpoint=/var/lib/libvirt -o canmount=on                                  zroot/var/lib/libvirt"
         echo "zfs create -o mountpoint=/var/lib         -o canmount=off                                 zroot/var/log"
         echo "zfs create -o mountpoint=/var/cache       -o canmount=off -o com.sun:auto-snapshot=false  zroot/var/cache"
@@ -251,6 +251,10 @@ write_script() {
         echo "  pacman -S --noconfirm age lua gvim git openssh tmux unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide wezterm xterm"
         echo "  pacman -S --noconfirm remmina freerdp"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
+        echo
+        echo "  mkdir -p /etc/docker"
+        echo "  echo '{\"storage-driver\":\"zfs\"}' >> /etc/docker/daemon.json"
+        echo "  pacman -S --noconfirm docker; systemctl enable docker"
         echo
         echo "  su \$USERNAME -c 'paru -S --noconfirm zrepl-bin'"
         echo "  mkdir -p /etc/zrepl"
