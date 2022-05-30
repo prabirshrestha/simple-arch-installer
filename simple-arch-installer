@@ -256,6 +256,10 @@ write_script() {
         echo "  pacman -S --noconfirm remmina freerdp"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
         echo
+        echo "  pacman -S --noconfirm tailscale"
+        echo "  systemctl enable --now tailscaled # run 'tailscale up' to authenticate after restart"
+        echo "  paru -S --noconfirm tailscale-systray-git"
+        echo
         echo "  mkdir -p /etc/docker"
         echo "  echo '{\"storage-driver\":\"zfs\"}' >> /etc/docker/daemon.json"
         echo "  pacman -S --noconfirm docker; systemctl enable docker"
