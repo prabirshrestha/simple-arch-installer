@@ -77,6 +77,8 @@ write_script() {
         echo "  USERPASSWORD=\$password1"
         echo "done"
         echo
+        echo "reflector --latest 20 --country 'United States' --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
+        echo
         echo "timedatectl set-ntp true"
         echo "curl -s https://eoli3n.github.io/archzfs/init | bash"
         echo
@@ -154,6 +156,8 @@ write_script() {
         echo "  echo 'Server = https://archzfs.com/\\\$repo/\\\$arch' >> /etc/pacman.conf"
         echo
         echo "  pacman -Syu --noconfirm"
+        echo "  pacman -S --noconfirm reflector"
+        echo "  reflector --latest 20 --country 'United States' --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
         echo "  pacman -S --noconfirm archzfs-linux-lts"
         echo "  #pacman -S --noconfirm archzfs-dkms linux-headers"
         echo "  zpool set cachefile=/etc/zfs/zpool.cache zroot"
