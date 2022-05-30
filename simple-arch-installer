@@ -135,7 +135,7 @@ write_script() {
         echo "mkdir -p /mnt/boot/efi"
         echo "mount \$BOOTDISK /mnt/boot/efi"
         echo
-        echo "pacstrap /mnt base base-devel linux linux-firmware linux-headers"
+        echo "pacstrap /mnt base base-devel linux-lts linux-firmware linux-lts-headers"
         echo "mkdir /mnt/etc/zfs"
         echo "cp /etc/zfs/zpool.cache /mnt/etc/zfs/zpool.cache"
         echo "cat << EOF >> /mnt/etc/fstab"
@@ -154,8 +154,8 @@ write_script() {
         echo "  echo 'Server = https://archzfs.com/\\\$repo/\\\$arch' >> /etc/pacman.conf"
         echo
         echo "  pacman -Syu --noconfirm"
-        echo "  #pacman -S --noconfirm archzfs-linux"
-        echo "  pacman -S --noconfirm archzfs-dkms linux-headers"
+        echo "  pacman -S --noconfirm archzfs-linux-lts"
+        echo "  #pacman -S --noconfirm archzfs-dkms linux-headers"
         echo "  zpool set cachefile=/etc/zfs/zpool.cache zroot"
         echo "  systemctl enable zfs.target zfs-import-cache zfs-mount zfs-import.target"
         echo
