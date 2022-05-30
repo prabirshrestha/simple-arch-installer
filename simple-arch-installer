@@ -135,7 +135,7 @@ write_script() {
         echo "mkdir -p /mnt/boot/efi"
         echo "mount \$BOOTDISK /mnt/boot/efi"
         echo
-        echo "pacstrap /mnt base linux linux-firmware"
+        echo "pacstrap /mnt base base-devel linux linux-firmware linux-headers"
         echo "mkdir /mnt/etc/zfs"
         echo "cp /etc/zfs/zpool.cache /mnt/etc/zfs/zpool.cache"
         echo "cat << EOF >> /mnt/etc/fstab"
