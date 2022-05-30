@@ -243,7 +243,7 @@ write_script() {
         echo
         echo "  ### GUI ###"
         echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
-        echo "  pacman -S --noconfirm awesome nemo gvfs-smb rofi arc-icon-theme"
+        echo "  pacman -S --noconfirm awesome nemo gvfs-smb rofi arc-icon-theme xsel"
         echo "  #pacman -S --noconfirm xorg xfce4 xfce4-goodies"
         echo "  #pacman -S --noconfirm gnome gdm gnome-tweak-tool; systemctl enable gdm"
         echo "  #pacman -S --noconfirm plasma konsole"
