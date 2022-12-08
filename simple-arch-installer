@@ -80,7 +80,7 @@ write_script() {
         echo "reflector --latest 20 --country 'United States' --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
         echo
         echo "timedatectl set-ntp true"
-        echo "curl -s https://eoli3n.github.io/archzfs/init | bash"
+        echo "curl -s https://raw.githubusercontent.com/eoli3n/archiso-zfs/master/init | bash"
         echo
         echo "[ \"\${FULLDISKWIPE}\" = \"y\" ] && pv --timer --rate --stop-at-size -s \"\$(blockdev --getsize64 \$DISK)\" /dev/zero > \$DISK"
         echo "sgdisk --zap-all \$DISK # zap anything existing"
