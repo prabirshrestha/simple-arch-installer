@@ -25,7 +25,7 @@ if [ -z "$DISK" ]; then
 fi
 
 grep MemTotal /proc/meminfo
-# read -p "Enter swap size (ex: 0 or 1024MiB or 8GiB): " SWAPSIZE
+read -p "Enter swap size (ex: 0 or 8G): " SWAPSIZE
 read -p "Full disk wipe (y/n): " FULLDISKWIPE
 read -p "Enter hostname: " HOSTNAME
 read -p "Enter username: " USERNAME
@@ -128,7 +128,11 @@ write_script() {
         echo "zfs create -o mountpoint=/usr             -o canmount=off                                 zroot/usr"
         echo "zfs create -o mountpoint=/usr/local       -o canmount=off                                 zroot/usr/local"
         echo "zpool set bootfs=zroot/ROOT/default zroot"
-        echo "zpool export zroot"
+        echo "zfs create -V \$(SWAPSIZE) -b \$(getconf PAGESIZE) -o logbias=throughput -o sync=always -o primarycache=metadata -o secondarycache=none -o com.sun:auto-snapshot=false -o compression=zle zroot/swap"
+        echo "mkswap -f /dev/zvol/zroot/swap"
+        echo "swapon /dev/zvol/zroot/swap"
+        echo "swapoff -a"
+	echo "zpool export zroot"
         echo "zpool import -R /mnt zroot"
         echo "[[ \"\$DISKPASSWORD\" != \"\" ]] && echo -n \"\$DISKPASSWORD\" | zfs load-key zroot"
         echo "zfs mount -la"
@@ -141,6 +145,7 @@ write_script() {
         echo "mkdir /mnt/etc/zfs"
         echo "cp /etc/zfs/zpool.cache /mnt/etc/zfs/zpool.cache"
         echo "cat << EOF >> /mnt/etc/fstab"
+        echo "/dev/zvol/zroot/swap none swap discard 0 0"
         echo "UUID=\"\$(blkid -s UUID -o value \$BOOTDISK)\" /boot/efi vfat defaults 0 0"
         echo "EOF"
         echo
@@ -321,5 +326,3 @@ if [ "$RUN_INSTALLER" == "YES" ]; then
 else
     echo "Cancelling installation"
 fi
-
-
