@@ -242,6 +242,9 @@ write_script() {
         echo "  su \"\$USERNAME\" -c \"paru -S --noconfirm dotter-rs-bin\""
         echo "  if [ \$DOTFILESREPO != \"\" ]; then su \$USERNAME -c 'git clone --recurse-submodules https://github.com/\$DOTFILESREPO.git ~/.dotfiles && cd ~/.dotfiles && dotter -vv && git remote rm origin && git remote add origin git@github.com:\$DOTFILESREPO.git'; fi;"
         echo
+        echo "  ### BLUETOOTH ###"
+        echo "  pacman -S --noconfirm bluez bluez-utils blueman; systemctl enable bluetooth.service"
+        echo
         echo "  ### SOUND ###"
         echo "  pacman -S --noconfirm pipewire pipewire-alsa pipewire-pulse pipewire-media-session pavucontrol"
         echo "  su \"\$USERNAME\" -c \"systemctl --user enable pipewire.service pipewire.socket pipewire-media-session.service pipewire-pulse.service pipewire-pulse.socket\""
