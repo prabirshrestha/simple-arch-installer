@@ -250,6 +250,7 @@ write_script() {
         echo "  su \"\$USERNAME\" -c \"systemctl --user enable pipewire.service pipewire.socket pipewire-media-session.service pipewire-pulse.service pipewire-pulse.socket\""
         echo
         echo "  ### GUI ###"
+        echo "  pacman -S --noconfirm xorg-drivers"
         echo "  pacman -S --noconfirm sddm; systemctl enable sddm.service"
         echo "  pacman -S --noconfirm awesome nemo gvfs-smb rofi arc-icon-theme xsel"
         echo "  #pacman -S --noconfirm xorg xfce4 xfce4-goodies"
