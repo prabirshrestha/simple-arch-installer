@@ -265,7 +265,7 @@ write_script() {
         echo "  #pacman -S --noconfirm chromium"
         echo
         echo "  ### DEV ###"
-        echo "  pacman -S --noconfirm age bore lua gvim git openssh tmux zip unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide wezterm xterm lsof net-tools"
+        echo "  pacman -S --noconfirm age sops bore lua gvim git openssh tmux zip unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide wezterm xterm lsof net-tools"
         echo "  pacman -S --noconfirm remmina freerdp"
         echo "  pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch watchexec"
         echo
