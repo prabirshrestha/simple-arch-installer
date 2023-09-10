@@ -146,8 +146,10 @@ write_script() {
         echo "pacstrap /mnt base base-devel linux-lts linux-firmware linux-lts-headers"
         echo "mkdir /mnt/etc/zfs"
         echo "cp /etc/zfs/zpool.cache /mnt/etc/zfs/zpool.cache"
+        echo "if [[ \"\$SWAPSIZE\" != \"0\" ]]; then"
+        echo "  echo \"/dev/zvol/zroot/swap none swap discard 0 0\" >> /mnt/etc/fstab"
+        echo "fi"
         echo "cat << EOF >> /mnt/etc/fstab"
-        echo "/dev/zvol/zroot/swap none swap discard 0 0"
         echo "UUID=\"\$(blkid -s UUID -o value \$BOOTDISK)\" /boot/efi vfat defaults 0 0"
         echo "EOF"
         echo
