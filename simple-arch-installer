@@ -225,7 +225,8 @@ write_script() {
         echo "[Network]"
         echo "DHCP=yes"
         echo "END"
-        echo "  rm -f /etc/resolv.conf && systemctl enable systemd-resolved && ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
+        echo "  #rm -f /etc/resolv.conf && systemctl enable systemd-resolved && ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf"
+        echo "  systemctl enable systemd-resolved"
         echo "  systemctl enable systemd-networkd"
         echo
         echo "  pacman -S --noconfirm iwd"
