@@ -203,7 +203,7 @@ write_script() {
         echo
         echo "  ### USER and SUDO configuration ###"
         echo "  # bug: https://bugs.archlinux.org/task/79619"
-        echo "  pacman --noconfirm -U https://archive.archlinux.org/packages/s/systemd/systemd-254.1-1-x86_64.pkg.tar.zst"
+        echo "  pacman --noconfirm -U https://archive.archlinux.org/packages/s/systemd/systemd-254.3-1-x86_64.pkg.tar.zst"
         echo "  pacman -S --noconfirm sudo"
         echo "  sed -i '/%wheel ALL=(ALL:ALL) ALL/s/^#//' /etc/sudoers"
         echo "  useradd --no-create-home --home /home/\$USERNAME -g users -G wheel \$USERNAME"
