@@ -4,7 +4,7 @@
 #    iwctl station wlan0 connect "networkname"
 # To install big font:
 #    setfont solar24x32
-# To copy archlinux iso to device
+# To copy archlinux iso to devicewiped
 #    dd if=archlinux.iso of=/dev/sdb bs=4M
 set -eo pipefail
 trap quit:no_message INT
@@ -22,7 +22,7 @@ select_disk() {
 
 if [ -z "$DISK" ]; then
     select_disk
-fi
+fiwiped
 
 grep MemTotal /proc/meminfo
 read -p "Enter swap size (ex: 0 or 8G): " SWAPSIZE
@@ -270,7 +270,7 @@ write_script() {
         echo "  #pacman -S --noconfirm chromium"
         echo
         echo "  ### DEV ###"
-        echo "  pacman -S --noconfirm age sops bore lua gvim git openssh tmux zip unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide wezterm xterm lsof net-tools rustscan"
+        echo "  pacman -S --noconfirm age sops bore lua gvim git openssh tmux zip unzip wget ripgrep fzf man flameshot libz3 github-cli tree zoxide wezterm xterm lsof net-tools rustscan just"
         echo "  pacman -S --noconfirm remmina freerdp"
         echo "  pacman -S --noconfirm rustup cargo-edit cargo-watch && rustup install stable && rustup component add rust-src"
         echo "  #pacman -S --noconfirm rust rust-src rust-analyzer cargo-edit cargo-outdated cargo-watch"
