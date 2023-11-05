@@ -4,7 +4,7 @@
 #    iwctl station wlan0 connect "networkname"
 # To install big font:
 #    setfont solar24x32
-# To copy archlinux iso to devicewiped
+# To copy archlinux iso to device
 #    dd if=archlinux.iso of=/dev/sdb bs=4M
 set -eo pipefail
 trap quit:no_message INT
@@ -22,7 +22,7 @@ select_disk() {
 
 if [ -z "$DISK" ]; then
     select_disk
-fiwiped
+fi
 
 grep MemTotal /proc/meminfo
 read -p "Enter swap size (ex: 0 or 8G): " SWAPSIZE
