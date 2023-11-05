@@ -13,6 +13,7 @@ INSTALL_SCRIPT=install_os.sh
 EDITOR=vim
 
 select_disk() {
+   lsblk -o name,model,serial,size
    select ENTRY in $(ls /dev/disk/by-id/ | grep -v '\-part*');
        do
            DISK="/dev/disk/by-id/$ENTRY"
